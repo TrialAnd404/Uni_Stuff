@@ -1,0 +1,66 @@
+create view kundendaten as
+	select p.vorname,
+	       p.nachname,
+	       k.adresse
+	       k.PNr
+	from person as p
+		left outer join kunde as k
+			on k.PNr = p.PNr;
+			
+select * from kundendaten;
+
+
+select kundendaten.Vorname,
+	kundendaten.Nachname,
+	AVG(summe) as durchschnitt
+	from (select PNr, BNr, sum(anzahl) as summe
+		from bestellung
+		natural join bestellung_beinhaltet
+		group by BNr) as be_sum
+	natural join kundendaten
+	group by PNr;
+	
+
+update kunde
+set adresse = 'Unter den Eichen 5, 65195 Wiesbaden'
+where PNr IN(
+	Select PNr from person
+		where person.vorname LIKE 'Jan'
+		AND person.nachname LIKE 'Kramer'		
+);
+
+insert into bestellung (BNr, Bestellweg, Zeitstempel, KNr)
+values ('BE-0070',
+	'Post',
+	'CURRENT_TIMESTAMP',
+	(select KNr from Kunde
+		where PNr in (Select PNr from Person
+				where vorname='Jörg' AND
+				nachname = 'Müller')
+	)
+)
+//BNr Autoincrement, ansonsten BNr auch setzen
+
+insert into bestellung_medienartikel (BNr, ANr, Anzahl, Einzelpreis)
+values ('BE-0070',
+	Select ANr from Medienartikel
+		where Titel = 'Pirates of the Caribbean',
+	1,
+	Select Preis from Angebot
+		where ANr in (Select ANr from Medienartikel
+				where Titel = 'Pirates of the Caribbean'
+		)
+);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+

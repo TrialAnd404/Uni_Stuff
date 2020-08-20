@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="163cc6a4-0e6a-4dbf-949b-4f4889feb9c3" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../../ADS/Abgabe1/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Abgabe1/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Abgabe1/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Abgabe1/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Abgabe1/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Abgabe1/Abgabe1.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Abgabe1/src/Potions/Potions.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Abgabe1/src/Potions/PotionsTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Übung2/Übung2.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Übung7/src/BracketChecker.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Übung7/Übung7.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Übung8/BinTree/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Übung8/BinTree/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Übung8/BinTree/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Übung8/BinTree/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Übung8/BinTree/BinTree.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../ADS/Übung8/BinTree/src/BinTree.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Übung4_2/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Übung4_2/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Übung4_2/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Übung4_2/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Übung4_2/src/LL.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Übung4_2/src/Li.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Übung4_2/Übung4_2.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Tree.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Übung5.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Übung2_PMT/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Übung2_PMT/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Übung2_PMT/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Übung2_PMT/src/AL.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Übung2_PMT/src/AL.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Übung2_PMT/src/LLIt.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Übung2_PMT/src/LLIt.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectId" id="1cdLIqhKCMe4CgnsZzO6hVvud1j" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="163cc6a4-0e6a-4dbf-949b-4f4889feb9c3" name="Default Changelist" comment="" />
+      <created>1590853446695</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1590853446695</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="570" y="266" width="424" height="525" key="FileChooserDialogImpl" timestamp="1591627709874">
+      <screen x="72" y="27" width="1428" height="973" />
+    </state>
+    <state x="570" y="266" width="424" height="525" key="FileChooserDialogImpl/72.27.1428.973@72.27.1428.973" timestamp="1591627709874" />
+    <state x="94" y="116" width="1380" height="808" key="new project wizard" timestamp="1591627729136">
+      <screen x="72" y="27" width="1428" height="973" />
+    </state>
+    <state x="94" y="116" width="1380" height="808" key="new project wizard/72.27.1428.973@72.27.1428.973" timestamp="1591627729136" />
+  </component>
+</project>

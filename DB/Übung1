@@ -1,0 +1,52 @@
+Aufgabe1
+##############
+Unterschied Relationale Datenbanken/Objektrelationale Datenbanken/NoSQL Datenbanken:
+
+Relationale Datenbanken speichern Daten in einem konzeptionellen Modell in Tabellen gespeichert. Es wird versucht Daten in einer Redundanzfreien Einmalspeicherung aufzunehmen, Daten werden in einfachen Datentypen gespeichert.
+Im Gegensatz dazu werden bei Objektrelationalen Datenbanken direkt ganze Objekte gespeichert. Das bedeutet dass eigene, komplexe Datentypen erstellt werden können und in die Datenbank eingepflegt werden können. Dadurch sind Transaktionen aber auch aufwändiger, was zu anderen Mehrbenutzermechanismen führt als be Relationalen Datenbanken.
+NOSQL Datenbanken sind Datenbanken, die keine SQL Schnittstelle haben und sind nicht relational. Sie sind auf eine verteilte, horizontal saklierte Verteilung ausgelegt um möglichst große Datenmengen verwalten zu können. NOSQL Datenbanken können nahezu alles abspeichern, unabhängig von der Art der Daten. Beispiele sind z.b. Key-Value Stores, XML Datenbanken und Document Stores.
+
+
+
+
+Aufgabe2
+##############
+-> Was soll gespeichert werden?
+-> In welcher Form liegen die Daten vor?
+-> Welche Eigenschaften sind hier wichtig?
+-> Wie sind die Relationen zwischen den einzelnen Entitäten?
+-> Wie groß sind die Datenmengen?
+-> Wie wichtig ist Performance?
+-> Wie sollen die Daten bearbeitet werden?
+-> Welche Usergruppen gibt es?
+-> Wie sind die Zugriffsrechte der einzelnen Usergruppen?
+
+Aufgabe3  
+##############
+Waren
+->Lieferanten, Liefertermine
+->Menge im Lager
+-->Mindestlagerbestand
+->Ablaufdaten
+->Kühlware
+->Preis
+->Kennnummer
+==>Liegen Daten als Rohdaten vor oder in Form von Dokumenten?
+
+->Mehrere Kassen? => Multiuserzugriff nötig?
+->Online Versand? => Multiuserzugriff nötig?
+
+
+Mitarbeiter
+->Gehalt
+->Position
+->Zugangsberechtigungen
+->Gearbeitete Stunden/Monat
+
+==>Wie werden Daten erfasst/Manipuliert? evtl teilw. kein Multiuserzugriff nötig?
+==>Wer hat hier Zugriff? Wer darf Personenbezogene Daten einsehen?
+
+Laden
+->Fläche
+->Mitarbeiter
+->Verortung
