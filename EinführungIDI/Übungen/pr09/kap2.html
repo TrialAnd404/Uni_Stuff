@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <title>Ein Muster fuer HTML 5</title>
+    <link rel="stylesheet" type="text/css" href="common_styles.css" media="screen" />
+    <meta charset="UTF-8" />
+    <meta name="ROBOTS" content="NOINDEX, NOFOLLOW" />
+    <!-- Mehr zu "meta": https://wiki.selfhtml.org/wiki/HTML/Kopfdaten/meta -->
+  </head>
+  <body>
+    <h1 id=title>Kapitel 2</h1>
+    <h2>Dieses Kapitel beschaeftigt sich mit Verweisen.</h2>
+    <h3 id=abs1>Abschnitt 1</h3>
+    <p>Der Abschnitt 1 beschaeftigt sich hauptsaechlich mit internen Verweisen.</p>
+    <p>
+      <a href="#abs2">Ich bin ein interner Verweis auf den Abschnitt 2</a>
+    </p>
+    <p>
+      <a href="#">Ich bin ein interner Verweis auf den Anfang dieser Datei</a>
+    </p>
+    <p>
+      <a href="#ende">Ich bin ein interner Verweis auf das Ende dieser Datei</a>
+    </p>
+    <p>
+      <a href="einleitung.html#kursiv">Ich bin ein Verweis auf den Absatz mit dem kursiven Wort in der Einleitung.</a>
+    </p>
+    <h3 id=abs2>Abschnitt 2</h3>
+    <p>Der Abschnitt 2 beschaeftigt sich hauptsaechlich mit externen Verweisen.</p>
+    <p>
+      <a href="#abs1">Ich bin ein interner Verweis auf Abschnitt 1</a>
+    </p>
+    <p>
+      <a href="https://www.hs-rm.de">Ich bin ein Verweis auf die Homepage der HS RheinMain</a>
+    </p>
+    <p>
+      <a href="https://www.hs-rm.de/de/fachbereiche/design-informatik-medien/studiengaenge/">Ich bin ein Verweis auf die Studiengaenge des Fachbereichs DCSM</a>
+    </p>
+    <p>
+      <a href="mailto:tim.rumrich@gmx.de">E-Mail schreiben</a>
+    </p>
+    <p>
+      <a href="validator.w3.org">Ich bin ein Verweis auf den (X)HTML-Validierer des W3C</a>
+    </p>
+    <p>
+      <a href="ftp.heise.de/pub/">Ich bin ein Verweis auf den oeffentlichen Bereich des ftp-Servers des Heise-Verlags</a>
+    </p>
+    <p>
+      <a href="images/redback.gif">Ich bin ein Verweis auf redback.gif</a>
+    </p>
+    <p>
+      <a href="#">Ich bin ein interner Verweis auf den Anfang dieser Datei</a>
+    </p>
+    <p>
+      <a href="inhaltsverzeichnis.html">Ich bin ein Verweis auf das Inhaltsverzeichnis</a>
+    </p>
+    <p id=ende>Ich bin das Ende.</p>
+  </body>
+</html>

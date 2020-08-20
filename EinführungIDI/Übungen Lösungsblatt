@@ -1,0 +1,115 @@
+1.1
+a cp ~werntges/lv/einf-inf/meineErsteDatei .
+b ls
+c cat meineErsteDatei
+
+1.2
+a cp ~werntges/lv/einf-inf/meineZweiteDatei .
+  cat meineZweiteDatei
+  more meineZweiteDatei
+  cat gibt Gesamtinhalt aus
+  more gibt Inhalt gestaffelt aus -> immer nur so viele Zeilen,
+  wie ins Terminalfenster passen 
+b Space vorwärts, P rückwärts
+c cp ~werntges/lv/einf-inf/vim_tutor.txt .
+  cat vim_tutor.txt
+  more vim_tutor.txt
+
+1.3
+----------------------------
+a cp meineErsteDatei MeineKopierteDatei
+  cp meineZweiteDatei M
+  ls MeineKopierteDatei
+  ls M
+  less meineZweiteDatei
+  less M
+
+b ls meine*
+  -> Alle Dateien die mit "meine" beginnen gefolgt von beliebig vielen
+  beliebigen Zeichen
+  ls Meine*
+  -> Alle Dateien die mit "Meine" beginnen gefolgt von beliebig vielen
+  beliebigen Zeichen
+  ls ?
+  -> Alle Dateien mit einem einzelnen beliebigen Zeichen als Dateinamen
+  ls ?eine*
+  -> Alle Dateien mit dem Dateinamen <beliebiges Zeichen>+"eine"
+  gefolgt von beliebig vielen beliebigen Zeichen
+
+c mv MeineKopierteDatei m
+  ls m
+  less m
+
+d rm m
+  ls -altr
+
+e löscht alle Dateien mit Dateinamen "M" gefolgt von beliebig vielen
+  beliebigen Zeichen im aktuellen Verzeichnis
+
+f löscht alle Dateien mit beliebigem Namen im aktuellen Verzeichnis
+
+1.4
+----------------------------
+a pwd
+
+b relative Pfade -> Pfad abhängig vom aktuellen Verzeichnis
+  (zB ../../dir_a/file_23)
+  absolute Pfade -> Pfad im Dateiverzeichnis
+  (zB ~/uebdir1/dir_a/file_23)
+
+c das übergeordnete Verzeichnis
+
+d mkdir -p uebdir1/dir_c/dir_ca
+  mkdir uebdir1/dir_c/dir_cx
+  mkdir uebdir1/dir_b
+  mkdir uebdir1/dir_a
+  cd uebdir1/dir_c/dir_ca
+  touch file_31
+  touch file_32
+  touch file_33
+  ~/uebdir1
+  touch file_1
+  touch dir_a/.hidden
+  touch dir_a/file_21
+  touch dir_a/file_22
+  touch dir_a/file_23
+
+e ls -R
+
+f ls .
+  listet sichtbare Dateien & Directories im aktuellen Verzeichnis
+  ls ..
+  listet sichtbare Dateien & Directories im übergeordneten Verzeichnis
+  ls .*
+  listet sichtbare und unsichtbare Dateien & Directories im aktuellen
+  Verzeichnis und sichtbare Dateien & Directories
+  aus dem übergeordneten Verzeichnis
+g cd uebdir1/dir_b/../dir_c/dir_ca/.././..
+  = cd uebdir/   .   /  .  /   .
+  weil es wird dreimal in ein tieferes Directory gegangen und 3 mal in das
+  jeweils darüber liegende -> nach cd uebdir1 passiert nichts mehr
+h cd ~/uebdir1/dir_c/dir_cx
+  cd ../../dir_b
+  cd ../dir_a
+  cd ../dir_c/dir_ca
+
+1.5
+a cd
+  mv uebdir1/dir_c/dir_cx uebdir1/dir_c/dir_cb
+  mv uebdir1/dir_a/.hidden uebdir1/dir_a/was_hidden
+  ls -R
+b cp uebdir1/dir_a/file_23 uebdir1/dir_a/file_24
+c cp uebdir1/dir_c/dir_ca/* uebdir1/dir_c/dir_cb/
+d cp -r uebdir1/dir_c/dir_ca uebdir1/dir_c/dir_cb/
+e mv uebdir1/dir_c/dir_ca uebdir/dir_c/dir_cb/
+f cp uebdir1/dir_a/file* uebdir1/dir_b/
+g rm -r uebdir1/dir_c
+
+1.6 scp hsrm:~werntges/lv/einf-inf/viReferenzkarte.pdf .
+    hsrm -> bashrc alias auf lokalem Ubuntu
+
+1.7
+a anzahl verlinkungen auf entsprechendes Directory/Datei/etc
+  -> zB Directory erstellen oder mit ln Verlinkung erstellen
+b mkdir uebdir1/yeet
+  ln uebdir/file_1 Chris_P_Bacon
