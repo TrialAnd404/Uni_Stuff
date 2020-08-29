@@ -1,0 +1,16 @@
+MASTER:
+	Leerer Branch, default. kann nix, macht nix, hat nur skripte.
+	Gedacht zum "Fresh Start". git checkout -b <BRANCHNAME> für frischen Branch. Hier werden NUR EINMAL Semesterbranches angelegt! MIR EGAL IN WELCHEM SEMESTER IHR PMT BELEGT, DAS IST 2. SEMESTERFACH UND IST IM 2. SEMESTERBRANCH.
+	D.h: Hier hat eigentlich keiner was verloren, hier werden generelle administrative arbeiten erledigt.
+
+SEMESTER XYZ:
+	Branch zum einzlnen Semester. Hier kommt alles rein was zum jeweiligen Semester gehört.
+	Jeder User klont sich am besten den default Branch und schreibt dann nur auf dem. Im generellen Semester Branch wird nicht geschrieben, sonst kopiert sich beim branchen ja jeder deinen Müll - im Ausnahmefall dass das wirklich PERFEKT wäre, wäre das ok. Hier können Maximal Musterlösungen zu einzelnen Abgaben oder Lektüre zu Fächern rein. Allgemeines Semesterzeug halt. Selbes Spiel wie beim master: Hier hast du eigentlich nix verloren! Hier sind administrative/generelle Sachen drin. Wenn du nur ein bisschen vor dich hin arbeitest und keine Musterlösungen bereitstellst, ist das hier höchstwahrscheinlich nicht der richtige Branch für dich.
+
+SEMESTER XYZ_User:
+	Dein geklonter Branch. Das erste was du machst: Ein Repo mit deinem Namen, deiner Kennung, was auch immer in jedem Unterordner anlegen (Skript kommt). Einzigartig ist Name of the Game. Nur in diesen Ordner schmeisst du alles was du selber machst. Hier liegen DEINE Aufgaben und DEINE Lösungen, woher du die hast ist egal, ob selbst erarbeitet oder kopiert. Das ist dafür da, dass Leute diesen Branch als Referenz nutzen können. Wenn du UserA Sachen von UserB haben will, checkt er den Branch von UserB aus und guckt rein. Stellt euch vor das hier wär was wo die Profs draufgucken.
+	Bitte keine Sachen von anderen Branches zusätzlich kopieren bzw wenigstens die sinnlose Kopie löschen. Zu jeder Aufgabe gibt es 1 Lösung, deine.
+
+COMPLETE:
+	Hier kommt alles zusammen.
+	Deswegen der ganze Heckmeck vorher. Um hier drauf zu pushen auf dem eigenen Semesterbranch git push -ff origin <Branchname>:Complete. Hier SOLLTEN dann in jedem Fach die Lösungen von verschiedenen Usern zu finden sein. Evtl folgt ein Skript zum bewerten, so dass in irgendeiner Form kenntlich gemacht wird welche Lösungen besonders gut sind & ein Skript um zu bestimmten Aufgaben die beste Lösung zu finden.
