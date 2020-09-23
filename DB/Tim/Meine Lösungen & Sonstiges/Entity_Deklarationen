@@ -1,0 +1,24 @@
+Aufgabe1
+Auto = ({AutoID:int(100), Typ:char(20), Ausstattungsvariante:char(10), Fahrgestellnummer:int(10), Motornummer:int(10), Motorart:char(10), Hubraum:int(4), KW:int(4), Preis:int(10)}, {AutoID})
+Kunde = ({KundenID:int(10), Name (Vorname, Nachname):char(20), Adresse (Plz, Ort, Straße, Hausnummer):(int(5), char(20), char(20), int(4)), TelNr:int(20), BetreutSeit:date(10)},{KundenID})
+fährt = ({Auto},{Kunde},Kaufdatum)
+
+t1 :
+e1 = (1, „Golf“, „Li“, 12345, 12345,  „Benziner“ , 40, 50, 14000)
+e2 = (2, „Ford“, „Li“, 12346, 12346,  „Benziner“ , 80, 100, 90000)
+
+k1 = (1, „Max“ „Muster“, 12345 „Stadt“ „Straße“ 1, 015361234, 01.01.2001)
+
+fährt = (1, 1, 02.01.2001)
+
+t2:
+e1 = (1, „Golf“, „Li“, 12345, 12345,  „Benziner“ , 40, 50, 14000)
+e2 = (2, „Ford“, „Li“, 12346, 12346,  „Benziner“ , 80, 100, 90000)
+e3 = (3, „Ford“, „Gti“, 12347, 12347,  „Hydro“ , 90, 120, 100000)
+
+k1 = (1, „Max“ „Muster“, 12345 „Stadt“ „Straße“ 1, 015361234, 01.01.2001)
+k1 = (2, „Maxine“ „Muster“, 12345 „Stadt“ „Straße“ 2, 015361235, 03.01.2001)
+
+fährt = (1, 1, 02.01.2001)
+fährt = (2, 3, 03.01.2001)
+

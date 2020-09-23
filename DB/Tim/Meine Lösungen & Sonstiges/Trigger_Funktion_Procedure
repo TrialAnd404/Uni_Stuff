@@ -1,0 +1,158 @@
+CREATE TRIGGER `nachbestellung_generieren` AFTER UPDATE ON `lagerbestand` FOR EACH ROW 
+
+
+BEGIN
+IF EXISTS (SELECT * FROM nachbestellen WHERE a_nr = NEW.a_nr) then
+
+	IF (SELECT preis FROM angebot WHERE a_nr = NEW.a_nr) > 6 then
+		if NEW.bestand < 5 then
+			Update nachbestellen 
+				SET best_anzahl = 5-NEW.bestand
+				WHERE a_nr = NEW.a_nr;
+		END if;
+	ELSEif (SELECT preis FROM angebot WHERE a_nr = NEW.a_nr) <= 6 then
+		if NEW.bestand < 10 then 
+			Update nachbestellen 
+				SET best_anzahl = 10-NEW.bestand
+				WHERE a_nr = NEW.a_nr;
+		END if;
+	END if	;
+
+ELSE
+	
+	IF (SELECT preis FROM angebot WHERE a_nr = NEW.a_nr) > 6 then
+		if NEW.bestand < 5 then
+			INSERT INTO nachbestellen VALUES(
+				a_nr,
+				5-NEW.bestand
+			);
+		END if;
+	ELSEif(SELECT preis FROM angebot WHERE a_nr = NEW.a_nr) <= 6 then
+		if NEW.bestand < 10 then
+			INSERT INTO nachbestellen VALUES(
+				a_nr,
+				10-NEW.bestand
+			);
+		END if;
+	END if	;
+	
+END IF;
+END
+
+###########################################
+
+create trigger bestellung_beinhaltet_medienartikel_InsertTrigger
+	before insert on bestellung_beinhaltet_medienartikel
+    for each row
+    set new.anzahl =
+    	if(new.anzahl > (Select bestand
+           					from lagerbestand
+           					where a_nr = new.a_nr),
+           (Select bestand
+           					from lagerbestand
+           					where a_nr = new.a_nr),
+           new.anzahl);
+
+#########################################
+
+CREATE function repeat_loop_example() returns varchar(100)
+BEGIN
+  DECLARE x INT;
+  DECLARE str VARCHAR(255);
+  SET x = 5;
+  SET str = '';
+
+  REPEAT
+    SET str = CONCAT(str,x,',');
+    SET x = x - 1;
+    UNTIL x <= 0
+  END REPEAT;
+
+  return str;
+END
+
+################################################
+
+DROP FUNCTION LoopTest;
+
+DELIMITER //
+
+CREATE FUNCTION LoopTest(a INT)
+RETURNS INT DETERMINISTIC
+
+BEGIN
+	DECLARE iter INT;
+	DECLARE res INT;
+	
+	SET iter = a;
+	SET res = 1;
+	
+	label1: WHILE iter > 0 DO
+		SET res = res*iter;
+		SET iter = iter-1;
+	END WHILE label1;
+	
+	RETURN res;
+END
+2
+//
+
+SELECT LoopTest(3);
+
+###############################################
+
+delimiter $$
+
+DROP  PROCEDURE nachbestellung_zusammenstellen;
+
+CREATE PROCEDURE nachbestellung_zusammenstellen()
+Deterministic
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    
+    DECLARE _a_nr VARCHAR(13);
+    DECLARE _bestand INT;
+    DECLARE _preis DOUBLE;
+    
+    DECLARE runForestRun CURSOR FOR
+        SELECT a_nr, bestand, preis
+            FROM angebot NATURAL JOIN lagerbestand;
+    DECLARE CONTINUE handler FOR
+        NOT FOUND SET done = 1;
+        
+    OPEN runForestRun;
+    
+    repeat
+        fetch runForestRun INTO _a_nr, _bestand, _preis;
+        if NOT done then
+            if _preis > 6 then
+                if _bestand < 5 then
+                
+                    INSERT INTO `nachbestellen`
+                    VALUES(
+                        _a_nr,
+                        5 - _bestand
+                    );
+                    
+                END if;
+            ELSEIF _preis < 6 then
+                if _bestand < 10 then
+                
+                    INSERT INTO `nachbestellen` 
+                    VALUES(
+                        _a_nr,
+                        10 - _bestand
+                    );
+                
+                END if;
+            END if;
+        END if;
+    until done END repeat;
+    close runForestRun;
+    
+    
+END
+
+$$
+
+

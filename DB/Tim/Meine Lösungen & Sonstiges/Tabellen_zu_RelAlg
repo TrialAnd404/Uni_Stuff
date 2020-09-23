@@ -1,0 +1,19 @@
+CREATE TABLE studierende
+       (matrnr         INTEGER PRIMARY KEY,
+        name           VARCHAR(30) NOT NULL,
+        semester       INTEGER
+);
+
+CREATE TABLE vorlesung
+       (vorlnr         INTEGER PRIMARY KEY,
+        titel          VARCHAR(40),
+        sws            INTEGER,
+        gehaltenvon    INTEGER REFERENCES professor
+);
+
+CREATE TABLE hoert
+       (matrnr         INTEGER REFERENCES studierende ON DELETE CASCADE,
+        vorlnr         INTEGER REFERENCES vorlesung ON DELETE CASCADE,
+        PRIMARY KEY    (matrnr, vorlnr));
+
+

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+Semester=4
+
+nBranch="Semester$Semester"
+
+
+branch="$nBranch"
+existed_in_local=$(git branch --list ${branch})
+
+echo $existed_in_local
+
+if [[ -z ${existed_in_local} ]]; then
+    git checkout -b $nBranch
+else
+    echo "Fehler, Semester $Semester hat bereits einen Branch angelegt"
+fi
+

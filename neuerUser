@@ -1,0 +1,13 @@
+#!/bin/bash
+
+currentBranch="$(git branch --show-current)"
+echo "$currentBranch"
+
+read -p "Neuen lokalen Branch für welchen User anlegen?" user
+
+git checkout -b "$currentBranch"_"$user"
+
+mkdir $user
+for fach in $faecher do
+	mkdir $user/$fach
+

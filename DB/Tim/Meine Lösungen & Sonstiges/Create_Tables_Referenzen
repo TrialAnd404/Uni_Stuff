@@ -1,0 +1,87 @@
+CREATE TABLE `professor` (
+ `ProfessorID` int(5) NOT NULL AUTO_INCREMENT,
+ `Telefonnummer` int(10) NOT NULL,
+ `Dienstanschrift` varchar(10) NOT NULL,
+ `Fachbereich` text NOT NULL,
+ `Name` text NOT NULL,
+ PRIMARY KEY (`ProfessorID`)
+)
+
+CREATE TABLE `professorvorlesung` (
+ `ProfessorID` int(5) NOT NULL,
+ `VorlesungID` int(5) NOT NULL,
+ FOREIGN KEY `ProfessorID` (`ProfessorID`)
+  REFERENCES `Professor`(`ProfessorID`),
+ FOREIGN KEY `VorlesungID` (`VorlesungID`)
+  REFERENCES `vorlesung`(`VorlesungID`)
+) 
+
+CREATE TABLE `studentischehilfskraft` (
+ `StudierendeID` int(6) NOT NULL,
+ `Fachbereich` text NOT NULL,
+ `ArbeitsvertragBeginn` date NOT NULL,
+ `ArbeitsvertragEnde` date NOT NULL,
+ `BezahlteWochenstunden` double NOT NULL,
+ PRIMARY KEY (`StudiID`),
+ FOREIGN KEY `StudierendeID` (`StudierendeID`)
+  REFERENCES `studierende`(`StudierendeID`)
+)
+
+CREATE TABLE `studentübung` (
+ `StudierendeID` int(6) NOT NULL,
+ `ÜbungsID` int(5) NOT NULL,
+ FOREIGN KEY `StudierendeID` (`StudierendeID`)
+  REFERENCES `studierende`(`StudierendeID`),
+ FOREIGN KEY `ÜbungsID` (`ÜbungsID`)
+  REFERENCES `Übung`(`ÜbungsID`)
+)
+
+CREATE TABLE `studierende` (
+ `StudierendeID` int(6) NOT NULL AUTO_INCREMENT,
+ `MatrikelNr` int(10) NOT NULL,
+ `Name` text NOT NULL,
+ `Studienfach` text NOT NULL,
+ `Semesterzahl` int(2) NOT NULL,
+ `Adresse` varchar(15) NOT NULL,
+ `Abschluss` text NOT NULL,
+ PRIMARY KEY (`StudierendeID`)
+)
+
+CREATE TABLE `studierendevorlesung` (
+ `StudierendeID` int(6) NOT NULL,
+ `VorlesungID` int(5) NOT NULL,
+ FOREIGN KEY `StudierendeID` (`StudierendeID`)
+  REFERENCES `studierende`(`StudierendeID`),
+ FOREIGN KEY `VorlesungID` (`VorlesungID`)
+  REFERENCES `vorlesung`(`VorlesungID`)
+)
+
+CREATE TABLE `vorlesung` (
+ `VorlesungID` int(5) NOT NULL AUTO_INCREMENT,
+ `Tag` int(1) NOT NULL,
+ `Hörsaal` varchar(8) NOT NULL,
+ `Uhrzeit` time NOT NULL,
+ `Nummer` int(5) NOT NULL,
+ `Titel` text NOT NULL,
+ `Wochenstunden` int(2) NOT NULL,
+ PRIMARY KEY (`VorlesungID`)
+)
+
+CREATE TABLE `übung` (
+ `ÜbungID` int(5) NOT NULL AUTO_INCREMENT,
+ `VorlesungID` int(5) NOT NULL,
+ `Stundenzahl` int(2) NOT NULL,
+ `Nummer` int(2) NOT NULL,
+ `Uhrzeit` int(11) NOT NULL,
+ `Ort` varchar(10) NOT NULL,
+ `Tag` int(1) NOT NULL,
+ `StudierendeID` int(6) DEFAULT NULL,
+ `ProfessorID` int(5) NOT NULL,
+ PRIMARY KEY (`ÜbungID`),
+ FOREIGN KEY `ProfessorID` (`ProfessorID`)
+  REFERENCES `studierende`(`StudierendeID`),
+ FOREIGN KEY `VorlesungID` (`VorlesungID`)
+  REFERENCES `studierende`(`StudierendeID`),
+ FOREIGN KEY `StudierendeID` (`StudierendeID`)
+  REFERENCES `studierende`(`StudierendeID`)
+)

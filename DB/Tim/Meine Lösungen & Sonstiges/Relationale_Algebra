@@ -1,0 +1,6 @@
+π name ( σ vorlnr=null (π name,matrnr (studierende) ⟕ π matrnr, vorlnr (hoert)))
+
+
+π name ( σ semester = 4 (studierende))
+
+πtitel (vorlesung⨝hoert) ⨝ σname='Klaus' (studierende)
