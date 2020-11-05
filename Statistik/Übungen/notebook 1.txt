@@ -1,0 +1,75 @@
+ # Data Science: Autos auf E-Bay <img src="attachment:hsrmlogo.png" width="10%" align="right">
+Dieses Notebook stellt einen Datensatz von Gebrauchtwagen auf E-Bay vor, den wir als Beispiel in der Vorlesung verwenden werden. Unser Endziel wird es sein, den Verkaufspreis eines Autos (gegeben Merkmale wie sein Alter, seine Marke, etc.) vorherzusagen.
+
+Hierzu analysieren wir in diesem Notebook zunächst den Datensatz. Laden Sie die Datei 'cars.csv' aus Stud.IP herunter, plazieren Sie sie im gleichen Ordner wie das Notebook, und führen Sie die folgende Zelle aus. Es sollten Zeilen mit Merkmalen (0-56) ausgegeben werden.
+
+
+
+import pandas
+
+# Anmerkung: Man kann die Datei auch in Excel/Libreoffice öffnen.
+cars = pandas.read_csv('cars.csv')
+
+# Wir geben die Namen der Spalten/Merkmale aus.
+columns = cars.columns
+for i,col in enumerate(columns):
+    print('%.2d : %s' %(i,col))
+    
+# Wir konvertieren die Daten in ein Numpy-Array.
+data = cars.values.astype('float')
+
+In 'data' befindet sich nun eine Datenmatrix. Jede Zeile entspricht einem Auto, jede Spalte einem Merkmal. Berechnen Sie den Durchschnittspreis aller Autos und den Median des Preises. Welcher der beiden Werte ist erwartungsgemäß höher?
+
+print(cars['dollar_price'].sum()/len(cars.index))
+
+print(cars['dollar_price'].median())
+
+Die folgende Zelle plottet ein Histogramm aller 'prices'. Führen Sie die Zelle aus. Speichern Sie zu Beginn in 'prices' sämtliche Preise.
+
+Es sollte ein Histogramm-Plot erscheinen, der allerdings nur aus einem Balken besteht. Was ist das Problem?
+
+prices = cars.dollar_price
+
+# display histogram of prices
+import matplotlib.pyplot as plt
+plt.hist(prices)
+plt.show()
+
+Die Methode hist() besitzt einen Parameter 'bins'. Hier kann man eine Liste von Grenzen zwischen den einzelnen Partitionen/bins des Histograms angeben. Versuchen Sie sinnvolle Bins zu übergeben, so dass das Histogramm aussagekräftiger wird.
+
+bins = [0,5000,10000,15000,20000,50000]
+
+plt.hist(prices, bins)
+plt.show()
+
+'data' enthält einige 'brand'-Spalten ('brand_audi', 'brand_bmw', ...) die angeben ob das jeweilige Auto zu einer bestimmten Marke gehört. Entfernen Sie diese Spalten aus dem Datensatz.
+
+cols = [c for c in cars.columns if c.lower()[:6] != 'brand_']
+cars = cars[cols]
+print(cars)    
+
+Geben Sie das günstigste Auto aus. Warum ist es so günstig? Hat es einen Schaden?
+
+print(cars[cars.dollar_price == cars.dollar_price.min()])
+
+Führen Sie eine kleine Datenprüfung durch: Stellen Sie sicher, dass jedes Auto entweder beschädigt oder nicht beschädigt ist (d.h., die letzten zwei Spalten des Datensatzes sind korrekt).
+
+for index, row in cars.iterrows():
+    if cars['damage__ja'][index] + cars['damage__nein'][index] != 1:
+        print('fehler in zeile ' +str(index))
+
+
+Um einen Eindruck von der Beziehung zwischen Preis und Kilometerstand zu erhalten, plotten wir eine kleine Punktwolke. In dieser ist der Preis die x-Achse, der Kilometerstand die y-Achse, und jedes Auto ist ein Punkt.
+
+prices = cars['dollar_price']
+km = cars['kilometer']
+
+# plot km against price
+cars.plot.scatter(x='dollar_price', y='kilometer');
+#plt.plot(prices, km, 'o', markersize=3)
+#plt.xlim([0,20000])
+#plt.ylim([0,200000])
+#plt.xlabel('price')
+#plt.ylabel('km')
+#plt.show()
+
