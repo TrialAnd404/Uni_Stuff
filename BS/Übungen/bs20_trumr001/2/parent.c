@@ -18,9 +18,11 @@ int main(int argc, char *argv[], char *envp[])
 	}
 
 	if (pid1 == 0) { /* child 1*/
-		printf("Ich bin der Kindprozess pid1\n");
-		sleep(10);
-		printf("Kind1 Ende\n");
+		execve("./child1", argv, envp);
+		//printf("Ich bin der Kindprozess pid1\n");
+		//sleep(25);
+		//printf("Kind1 Ende\n");
+		//return EXIT_SUCCESS;
 	}
 	else { /* parent */
 		printf("Ich bin Elternprozess von pid1: %d\n", pid1);
@@ -30,9 +32,11 @@ int main(int argc, char *argv[], char *envp[])
 			exit(EXIT_FAILURE);
 		}
 		if (pid2 == 0) { /* child 2*/
-			printf("Ich bin der Kindprozess pid2\n");
-			for (volatile uint64_t i = 0; i < 100000; i++) {}
-			printf("Kind2 Ende\n");
+			execve("./child2", argv, envp);
+			//printf("Ich bin der Kindprozess pid2\n");
+			//for (volatile uint64_t i = 0; i < 10000000000; i++) {}
+			//printf("Kind2 Ende\n");
+			//return EXIT_SUCCESS;
 		}
 		else { /* parent */
 			printf("Ich bin Elternprozess von pid2: %d\n", pid2);
@@ -51,12 +55,11 @@ int main(int argc, char *argv[], char *envp[])
 	pid_t terminatedChild;
 	int n = 2;
 	while (n > 0) {
+		printf("Warten auf kinder...");
 		terminatedChild = wait(&status);
-		printf("Child with PID %ld exited with status 0x%x.\n", (long)terminatedChild, status);
+		printf("kind mit prozessnummer %ld wurde beendet.\n", (long)terminatedChild);
 		--n;
 	}
 	
-	printf("n=%d\nTschuess von pid %d\n", n, getpid());
-
 	return EXIT_SUCCESS;
 }
