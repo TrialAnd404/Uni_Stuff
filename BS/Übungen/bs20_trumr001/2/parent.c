@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 
 /* Beachten Sie den geaenderten Prototypen von main(). Referenz: man 2 execve */
 /* Sie koennen "envp" als Environment-Pointer an Kind-Prozesse weiterreichen. */
@@ -47,8 +50,14 @@ int main(int argc, char *argv[], char *envp[])
 
 	for (int i = 0; i < 15; i++) {
 		sleep(1);
-		system("date");
-		system("ps f");
+		if(system("date")<0){
+			printf("system date Error");
+			exit(EXIT_FAILURE);
+		}
+		if(system("ps f")<0){
+			printf("ps f Error");
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	int status;
