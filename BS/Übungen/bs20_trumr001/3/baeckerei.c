@@ -92,6 +92,7 @@ void* mehlzwerg(void* arg){
 			pthread_cond_wait(&signalLieferanten, &lock);
 		}
 		backstubeVerlassen();	
+		
 	}
 	
 	printf("arbeit ist vollbracht\n");
@@ -114,17 +115,19 @@ void* backzwerg(void* arg){
 			printf("blech nr %i fertig gebacken\n", i);
 			printf("bing bong alle aufwachen\n");
 			pthread_cond_broadcast(&signalLieferanten); 
-			if(i==10)
+
+			if(i==10){
+				printf("ok bois, reicht\n");
 				CONTINUE = false;
+			}
+
 			backstubeVerlassen();
 		}
 		else{
 			printf("nicht genug Zeug da. Bestand:\n%i eier %i milch %i mehl\n", *zutaten[0], *zutaten[1], *zutaten[2]);
 			backstubeVerlassen();
 		}
-
 	}
-	backstubeVerlassen();
 
 	printf("arbeit ist vollbracht\n");
 
