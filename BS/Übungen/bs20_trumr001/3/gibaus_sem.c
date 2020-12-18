@@ -28,6 +28,7 @@ void* gib_function(void* arg){
 	char* argv = arg;
 	char c = *argv;
 	for(int j = 0; j <5; j++){
+
 		sem_wait(&semLock); //LOCK
 		for(int i = 0; i< 10; i++){
 			printf("%c", c);
@@ -37,7 +38,8 @@ void* gib_function(void* arg){
 		}
 		printf("\n");
 	
-		sem_post(&semLock); //UNLOCK 
+		sem_post(&semLock); //UNLOCK
+		msleep(10);
 	}
 	return NULL;
 }

@@ -1,0 +1,129 @@
+#VRML V2.0 utf8
+EXTERNPROTO foo [exposedField SFColor color] "Eisläufer_draft.wrl"
+EXTERNPROTO foo2 [exposedField SFColor color] "Eisläufer_draft.wrl"
+EXTERNPROTO test_Laterne [] "Laterne_draft.wrl"
+
+Transform {
+    children [
+        #Eisbahn
+        Shape{
+            geometry Cylinder {
+                radius 50
+                height 0.5
+                bottom FALSE
+                top TRUE
+                side TRUE
+            }
+            appearance Appearance{
+                material Material{
+                }
+            }
+        }
+
+        Transform{
+            translation 0 0.5 0
+            children[
+                test_Laterne{}
+            ]
+        }
+        
+        Transform {
+            translation 55 10 55
+            children [
+                #Haus1
+                Shape{
+                    geometry Box {
+                        size 20 20 20
+                    }
+                    appearance Appearance{
+                        material Material{
+                        }
+                    }
+                }
+            ]
+        }
+
+        DEF fooTest Transform {
+            translation 10 0 30
+            children[
+                DEF fooTimer TimeSensor{
+                    cycleInterval 5.0
+                    loop TRUE
+                }
+
+                DEF Animation1 PositionInterpolator{
+                    key [0 0.2 1]
+                    keyValue[
+                        10 0 0
+                        0 10 0
+                        10 0 0
+                    ]
+                }
+
+                foo {}
+               
+            ]
+            
+        }
+
+        DEF foo2 Transform {
+            translation 10 0 10
+            center -10 0 -10
+            children[
+
+                DEF foo2Timer TimeSensor{
+                    cycleInterval 5.0
+                    loop TRUE
+                }
+
+                DEF Animation2 OrientationInterpolator{
+                    key [0 0.5 1]
+                    keyValue[
+                        0 1 0 0.0,
+                        0 1 0 3.14,
+                        0 1 0 6.28
+                    ]
+                }
+
+                DEF Animation3 OrientationInterpolator{
+                    key [0.5 1]
+                    keyValue[
+                        0 1 0 0.0,
+                        0 1 0 3.14,
+                        0 1 0 6.28
+                    ]
+                }
+
+
+                
+                foo2 {
+                    color 0 1 0
+                }
+            ]  
+
+        }    
+    ]
+}
+
+Viewpoint {
+	description "bar2"
+	position 0 100 0
+	orientation -1 0 0 1.5707963267948966
+}
+
+Viewpoint {
+	description "foo"
+	position 2 0 2
+}
+
+
+Viewpoint {
+	description "bar"
+	position 0 5 0
+}
+
+ROUTE fooTimer.fraction_changed TO Animation1.set_fraction
+ROUTE Animation1.value_changed TO fooTest.set_translation
+
+ROUTE foo2Timer.fraction_changed TO Animation2.set_fraction
+ROUTE Animation2.value_changed TO foo2.set_rotation

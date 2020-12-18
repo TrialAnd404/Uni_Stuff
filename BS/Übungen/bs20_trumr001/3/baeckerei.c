@@ -39,7 +39,7 @@ void* eierzwerg(void* arg){
 				printf("Aufstehen Bäckerboi\n");
 			pthread_cond_wait(&signalLieferanten, &lock);
 		}
-		backstubeVerlassen();	
+			backstubeVerlassen();
 	}
 	
 	printf("arbeit ist vollbracht\n");
@@ -65,7 +65,7 @@ void* milchzwerg(void* arg){
 				printf("Aufstehen Bäckerboi\n");
 			pthread_cond_wait(&signalLieferanten, &lock);
 		}
-		backstubeVerlassen();	
+			backstubeVerlassen();
 	}
 	
 	printf("arbeit ist vollbracht\n");
@@ -91,7 +91,7 @@ void* mehlzwerg(void* arg){
 				printf("Aufstehen Bäckerboi\n");
 			pthread_cond_wait(&signalLieferanten, &lock);
 		}
-		backstubeVerlassen();	
+			backstubeVerlassen();
 		
 	}
 	
