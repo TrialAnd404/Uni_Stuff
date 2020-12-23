@@ -1,0 +1,67 @@
+#VRML V2.0 utf8
+#TimeSensor example
+DEF changingball Transform{
+children [
+	Shape { #a "default" sphere in blue
+		appearance Appearance {
+			material DEF ballmaterial Material {
+			diffuseColor  0.0 0.0 1.0
+                  	}
+		}
+		geometry Sphere {} 
+	}
+
+    DEF TimeSource TimeSensor { # to have time-changed events
+		cycleInterval 5.0 # the length of one loop
+		loop          FALSE # the sensor will loop
+		startTime     0 #the timer will start immediately
+	}
+
+# the sensors are children of changingball: other objects can have different ones
+    
+    DEF Toggle TouchSensor { }
+    
+    
+              # to sense the click
+   
+
+    DEF onOffScript Script {
+   eventIn SFBool onOffIsActive
+   eventOut SFBool Toggle
+   field SFNode timeNode USE TimeSource
+   directOutput TRUE
+
+   url [
+	 "javascript:
+	         function onOffIsActive (active) {
+	   if (active) {
+	      if (timeNode.enabled == FALSE) {
+		 timeNode.set_enabled = TRUE;
+         timeNode.set_loop = TRUE
+	      }
+	      else {
+		 timeNode.set_enabled = FALSE;
+         timeNode.set_loop = FALSE
+	      }
+	   } }
+	 "
+	]
+    }
+
+	
+	DEF colrotator ColorInterpolator { # this will change the color
+		key [ 0.0, 0.5, 1.0 ] #3 key-positions to interpolate between
+		keyValue [ 0 0 1, 1 0 0, 0 0 1]
+	}
+  ]
+}
+
+#
+# link "output" of lightONScript to LIGHT
+#
+ROUTE Toggle.isActive TO onOffScript.onOffIsActive
+ROUTE onOffScript.isActive TO TimeSource.set_loop
+
+ROUTE TimeSource.fraction_changed TO colrotator.set_fraction #timer passes fractions to colrotator
+ROUTE colrotator.value_changed TO ballmaterial.set_diffuseColor # colrotator changes movingball color
+# link activation of startTime to eventIn of lightONScript
