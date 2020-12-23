@@ -68,7 +68,7 @@ Transform {
 
         DEF foo2 Transform {
             translation 10 0 10
-            center -10 0 -10
+            
             children[
 
                 DEF foo2Timer TimeSensor{
@@ -77,11 +77,13 @@ Transform {
                 }
 
                 DEF Animation2 OrientationInterpolator{
-                    key [0 0.5 1]
+                    key [0 0.2 .4 .6 .8 1]
                     keyValue[
-                        0 1 0 0.0,
+                        0 0 0 0,
                         0 1 0 3.14,
-                        0 1 0 6.28
+                        0 1 0 -6.28,
+                        0 1 0 3.14,
+                        0 0 0 0.0,
                     ]
                 }
 
