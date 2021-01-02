@@ -4,9 +4,10 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <time.h>
+#include <semaphore.h>
 #include <pthread.h>
+#include <time.h>
 
-pthread_mutex_t lock;
 
 /* Warten von 1 bis 10000 Millisekunden (10 Sekunden) */
 void msleep(unsigned int ms)
@@ -21,26 +22,25 @@ void msleep(unsigned int ms)
 	nanosleep(&ts, NULL);
 }
 
+sem_t semLock; 
+
 void* gib_function(void* arg){
 	char* argv = arg;
 	char c = *argv;
+	for(int j = 0; j <5; j++){
 
-	for(int i =0; i<5; i++){	
-		pthread_mutex_lock(&lock); //LOCK
-
+		sem_wait(&semLock); //LOCK
 		for(int i = 0; i< 10; i++){
-			printf("%c", c);	
+			printf("%c", c);
 			fflush(stdout);
 			srand(i*c); 
 			msleep((rand()%400)+100);
 		}
 		printf("\n");
-
-		pthread_mutex_unlock(&lock); //UNLOCK
+	
+		sem_post(&semLock); //UNLOCK
 		msleep(10);
 	}
-	
-
 	return NULL;
 }
 
@@ -50,12 +50,8 @@ int main(int argc, char *argv[])
 	pthread_t threads[6];
 	char* chr = "ABCDEF";
 	int ret;
-
-	if (pthread_mutex_init(&lock, NULL) != 0){
-        printf("\n mutex init failed\n");
-        return 1;
-    }
-	
+	void* ret2;
+	sem_init(&semLock, 0, 1); 
 
 	for(int i = 0; i < 6; i++){
 		ret = pthread_create(&threads[i], NULL, gib_function, &chr[i]);
@@ -65,11 +61,12 @@ int main(int argc, char *argv[])
 	}
 	
 	for(int i = 0; i < 6; i++){
-		pthread_join(threads[i], NULL);
+		pthread_join(threads[i], &ret2);
+		if(ret2!=0){
+			printf("something went wrong while joining thread #%i", i);
+		}
 	}
 
-	pthread_mutex_destroy(&lock);
-
+	sem_destroy(&semLock);
 	return EXIT_SUCCESS;
 }
-
