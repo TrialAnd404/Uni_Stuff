@@ -1,0 +1,257 @@
+#VRML V2.0 utf8
+DEF	Draft Transform {
+	
+	children [
+        DEF touch TouchSensor { }
+		DEF	torso Shape	{
+			geometry IndexedFaceSet	{
+				coord Coordinate {
+                    point	[
+					    #Torso
+                        #Front
+						-1.5 6 0.5
+                        1.5 6 0.5       
+                        -1 3 0.3
+                        1 3 0.3
+                        #Back
+                        -1.5 6 -0.5
+                        1.5 6 -0.5
+                        -1 3 -0.3
+                        1 3 -0.3
+				    ]
+                }
+
+				coordIndex [
+                    #vorne 
+                    0 2 3 1 -1
+                    #hinten
+                    4 5 7 6 -1
+                    #oben
+                    0 1 5 4 -1
+                    #unten
+                    2 3 7 6 -1
+                    #links
+                    0 2 6 4 -1 
+                    #rechts
+                    1 3 7 5 -1
+				]
+				solid FALSE
+			} #Indecedfaceset
+
+			appearance Appearance {
+				material Material {
+				} 
+			} #Appearance
+		} #torso
+
+        #Kopf
+		Transform {
+			translation	0 7 0
+			children [
+				Viewpoint {
+					position 0 0 0
+				}
+				DEF	head Shape {
+					geometry Sphere	{
+						radius	.8
+					}
+
+					appearance Appearance {
+						material Material {
+						}
+					} #Appearance
+				} #head
+            ]
+		}
+
+        DEF linkerArm Transform{
+            center -1.6 5.8 0
+            children[
+                Shape{
+			        geometry IndexedFaceSet	{
+				        coord Coordinate {point	[
+					        #Arm
+                            #schulter
+						    -1.6 6 0
+                            -1.6 5.8 0.5
+                            -1.6 5.8 -0.5
+                            -1.8 5.8 0
+                            #hand
+                            -1.5 3 0
+				        ]}
+
+				        coordIndex [  
+                            #schulter
+                            0 2 3 -1
+                            0 1 3 -1
+                            0 1 2 -1
+                            #arm
+                            1 3 4 -1
+                            2 3 4 -1
+                            1 2 4 -1
+				        ]
+				        solid FALSE
+			        } #Indecedfaceset
+
+			        appearance Appearance {
+				        material Material {
+				        } 
+			        } #Appearance
+                }
+            ]
+		}
+
+        DEF	rechterArm Transform {
+			rotation 0 1 0 3.1415
+			children
+				USE	linkerArm
+		}
+
+		DEF linkesBein Transform{
+            translation .6 3 0 
+			children[
+				Transform{
+					children[
+                        #Becken
+						Shape{
+						    geometry Sphere{
+							    radius .35
+						    }
+						    appearance Appearance {
+						        material Material{
+							    }
+						    }
+                        }
+                        #Bein
+                        Transform{
+						    children[
+							    Shape{
+			                        geometry IndexedFaceSet	{
+				                        coord Coordinate {
+                                            point	[
+					                            #Bein
+                                                #Hüfte
+						                        0 0.25 0.5
+                                                -0.4 -0.2 0.1
+                                                0.4 -0.2 0.1
+                                                0 -0.45 -0.3
+                                                0 -4 0
+				                            ]
+                                        }
+				                        coordIndex [  
+                                            #Bein
+                                            #Hüfte
+                                            0 1 3 2 -1
+                                            4 0 2 -1
+                                            4 2 3 -1
+                                            4 3 1 -1
+                                            4 1 0 -1
+				                        ]
+				                        solid FALSE
+			                        } #Indecedfaceset
+			                        appearance Appearance {
+				                        material Material {
+				                        } 
+			                        } #Appearance
+                                }
+
+                                DEF fussLinks Shape{
+			                        geometry IndexedFaceSet	{
+				                        coord Coordinate {
+                                            point	[
+                                                #Fuß
+                                                0 -3.7 0
+                                                -0.3 -4 0.8
+                                                0.3 -4 0.8
+                                                0.3 -4 -0.2
+                                                -0.3 -4 -0.2
+
+                                                #Kufen
+                                                0.005 -4 0.8
+                                                0.005 -4.2 0.6
+                                                0.005 -4.2 0
+                                                0.005 -4 -0.2
+                                                -0.005 -4 0.8
+                                                -0.005 -4.2 0.6
+                                                -0.005 -4.2 0
+                                                -0.005 -4 -0.2
+				                            ]
+                                        }
+				                        coordIndex [ 
+                                            #Fuß
+                                            1 2 3 4 -1
+                                            4 0 2 -1
+                                            4 3 2 -1
+                                            3 2 0 -1
+                                            0 2 1 -1
+
+                                            #Kufen
+                                            5 8 7 6 -1
+                                            9 12 10 9 -1
+                                            5 6 10 9 -1
+                                            5 6 10 9 -1
+				                        ]
+				                        solid FALSE
+			                        } #Indecedfaceset
+			                        appearance Appearance {
+				                        material Material {
+                                            diffuseColor 0.2 0.4 0.2
+				                        } 
+			                        } #Appearance
+                                }
+					        ]
+					    }
+
+                        
+					]
+				}
+			]
+		}
+        DEF	rechtesBein Transform {
+			
+            center 0.6 3 0
+            translation -1.2 0 0
+            
+			
+			children
+				USE	linkesBein
+		}
+
+		
+	] #children
+}
+
+DEF BewegungTimer TimeSensor{
+    cycleInterval 5.0
+    startTime 0
+    stopTime -1
+    loop TRUE
+}
+
+DEF BewegungTest OrientationInterpolator{
+                    key [
+                        0 .2 .4 .6 .8 1
+                    ]
+                    keyValue[
+						0 0 0 0
+						1 0 0 -0.7
+						0 0 0 0
+						1 0 0 0.7
+
+                    ]
+                }
+
+DEF Bewegung2Test OrientationInterpolator{
+                    key [
+                        0 .2 .4 .6 .8 1
+                    ]
+                    keyValue[
+						0 0 0 0
+						1 0 0 0.7	
+                    ]
+                }
+
+ROUTE BewegungTimer.fraction_changed TO BewegungTest.set_fraction
+ROUTE BewegungTimer.fraction_changed TO Bewegung2Test.set_fraction
+ROUTE BewegungTest.value_changed TO rechtesBein.set_rotation
+ROUTE Bewegung2Test.value_changed TO linkesBein.set_rotation

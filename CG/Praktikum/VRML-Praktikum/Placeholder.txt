@@ -1,0 +1,252 @@
+DEF TagSchalter Transform{
+        translation 20 20 20
+        children[
+            Shape{
+                appearance Appearance{
+                    material Material{}
+                }
+                geometry Sphere{
+                    radius 2
+                }
+            }
+            DEF ToggleTagNacht TouchSensor { }
+
+            DEF dayScript Script {
+                eventIn SFBool dayNightToggle
+                field SFNode background USE hintergrund
+                field SFBool state FALSE
+                field MFColor nightSky[
+                    0.0 0.1 0.8,
+                    0.0 0.05 0.6,
+                    0.0 0.02 0.2,
+                ]
+                field MFColor daySky[
+                    0.0 0.1 0.8,
+                    0.0 0.5 1.0,
+                    1.0 1.0 1.0
+                ]
+                field MFColor nightGround[
+                    0.3 0.2 0.2,
+                    0.25 0.2 0.1,
+                    0.0 0.0 0.0
+                    ]
+                field MFColor dayGround[
+                    0.0 0.0 0.0,
+                    0.5 0.4 0.2,
+                    0.6 0.45 0.45
+                ]
+   
+                url ["javascript:
+                    function dayNightToggle(active) {
+                        if (active) {
+                            if (state == FALSE) {
+                                background.skyColor = nightSky;
+                                background.groundColor = nightGround;
+                                state = TRUE;
+                        }
+                        else {
+                            background.skyColor = daySky;
+                            background.groundColor = dayGround;
+                            state = FALSE;
+                        }
+                    }
+                }"
+                ]
+            }
+
+        ]
+}
+
+DEF LichtSchalter Transform{
+    translation 20 50 20
+        children[
+            Shape{
+                appearance Appearance{
+                    material Material{}
+                }
+                geometry Sphere{
+                    radius 2
+                }
+            }
+            DEF ToggleLicht TouchSensor { }
+
+            DEF lightScript Script {
+                eventIn SFBool lightIsActive
+                eventOut SFBool lightState
+                field SFBool state FALSE
+   
+                url ["javascript:
+                    function lightIsActive(active) {
+                        if (active) {
+                            if (state == FALSE) {
+                                
+                                state = TRUE;
+                                lightState = TRUE;
+                        }
+                        else {
+                            
+                            state = FALSE;
+                            lightState = FALSE;
+                        }
+                    }
+                }"
+                ]
+            }
+        ]
+}
+
+#Tag/Nach Schalter
+ROUTE ToggleTagNacht.isActive TO dayScript.dayNightToggle
+
+#Lichtschalter Laternen
+ROUTE ToggleLicht.isActive TO lightScript.lightIsActive
+ROUTE lightScript.lightState TO Laterne1.lightOn
+ROUTE lightScript.lightState TO Laterne2.lightOn
+ROUTE lightScript.lightState TO Laterne3.lightOn
+ROUTE lightScript.lightState TO Laterne4.lightOn
+ROUTE lightScript.lightState TO Laterne5.lightOn
+ROUTE lightScript.lightState TO Laterne6.lightOn
+
+
+
+
+
+
+
+
+
+DEF AnimationTimer1 TimeSensor{
+    cycleInterval 40.0
+    loop TRUE
+}
+
+DEF ToggleAnimation1 Script {
+eventIn SFTime toggle
+field SFNode timer USE AnimationTimer1
+field SFBool state FALSE
+field SFTime pause 0
+url["javascript:
+    function toggle(currentTime) {
+        if( state ) {
+            state = FALSE;
+            pause = currentTime - timer.startTime_changed;
+        }
+        else {
+            state = TRUE;
+            timer.set_startTime = currentTime - pause;
+            pause = 0;
+        }
+
+        timer.enabled = state;
+        timer.loop = state;
+
+    }"]
+}
+
+ROUTE Toggle1.touchTime TO ToggleAnimation1.toggle
+
+DEF AnimationTimer2 TimeSensor{
+    cycleInterval 40.0
+    loop TRUE
+}
+
+DEF ToggleAnimation2 Script {
+eventIn SFTime toggle
+field SFNode timer USE AnimationTimer2
+field SFBool state FALSE
+field SFTime pause 0
+url["javascript:
+    function toggle(currentTime) {
+        if( state ) {
+            state = FALSE;
+            pause = currentTime - timer.startTime_changed;
+        }
+        else {
+            state = TRUE;
+            timer.set_startTime = currentTime - pause;
+            pause = 0;
+        }
+
+        timer.enabled = state;
+        timer.loop = state;
+
+    }"]
+}
+
+ROUTE Toggle2.touchTime TO ToggleAnimation2.toggle
+
+DEF AnimationTimer3 TimeSensor{
+    cycleInterval 40.0
+    loop TRUE
+}
+
+DEF AnimationTimer4 TimeSensor{
+    cycleInterval 40.0
+    loop TRUE
+}
+
+DEF ToggleAnimation3 Script {
+eventIn SFTime toggle
+field SFNode timer USE AnimationTimer3
+field SFNode timerDelayed USE AnimationTimer4
+field SFBool state FALSE
+field SFBool initial TRUE
+field SFTime pause 0
+url["javascript:
+    function toggle(currentTime) {
+        if(initial){
+            initial = FALSE;
+            timerDelayed.set_startTime = currentTime + 5;
+        }
+        if( state ) {
+            state = FALSE;
+            pause = currentTime - timer.startTime_changed;
+        }
+        else {
+            state = TRUE;
+            timer.set_startTime = currentTime - pause;
+            pause = 0;
+        }
+        timerDelayed.enabled = state;
+        timer.enabled = state;
+    }"]
+}
+
+ROUTE Toggle3.touchTime TO ToggleAnimation3.toggle
+ROUTE Toggle4.touchTime TO ToggleAnimation3.toggle
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEF ToggleAnimation Script {
+eventIn SFTime toggle
+field SFNode timer USE BewegungTimer
+field SFBool state FALSE
+field SFTime pause 0
+url["javascript:
+    function toggle(currentTime) {
+        if( state ) {
+            state = FALSE;
+            pause = currentTime - timer.startTime_changed;
+        }
+        else {
+            state = TRUE;
+            timer.set_startTime = currentTime - pause;
+            pause = 0;
+        }
+
+        timer.enabled = state;
+    }"]
+}
+
+ROUTE touch.touchTime TO ToggleAnimation.toggle

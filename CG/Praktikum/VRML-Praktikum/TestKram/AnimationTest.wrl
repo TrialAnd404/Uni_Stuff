@@ -1,0 +1,50 @@
+#VRML V2.0 utf8
+
+Viewpoint { position 0 0 10 description "entry" }
+
+DEF box1 Transform {
+ translation -4 -2 0
+ rotation .2 .4 .5 1
+ children   [
+   DEF touch TouchSensor { }
+  Shape {
+   appearance Appearance {
+    material Material { diffuseColor 0 1 0  } }
+      geometry Box { }  }
+ ]}
+
+DEF timer TimeSensor {  cycleInterval 10  }
+
+DEF box1Pos PositionInterpolator {
+ key [ 0 .5 1 ]
+ keyValue [  -4 -2 0,  4 2 0,  -4 -2 0  ]
+}
+
+DEF s Script {
+ eventIn SFTime toggle
+ field   SFNode timer     USE  timer
+ field   SFBool  state     FALSE
+ field   SFTime  pause     0
+ url "vrmlscript:
+
+ function toggle(v) {
+  if( state ) {
+   state = FALSE;
+   pause = v - timer.startTime_changed;
+  }
+  else {
+   state = TRUE;
+   timer.set_startTime = v - pause;
+   pause = 0;
+  }
+
+  timer.enabled = timer.loop = state;
+
+ }
+ "
+
+}
+
+ROUTE touch.touchTime TO s.toggle
+ROUTE timer.fraction_changed TO box1Pos.set_fraction
+ROUTE box1Pos.value_changed TO box1.set_translation

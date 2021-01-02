@@ -1,0 +1,203 @@
+#VRML V2.0 utf8
+PROTO Laterne[
+    exposedField SFBool lightOn FALSE
+    exposedField SFFloat kegelTransparenz 1
+]{
+    Transform{
+        children[
+            Transform{
+                translation 0 7.5 0
+                    children[
+                        #Stange
+                        Shape{
+                            geometry Cylinder {
+                                radius 0.1
+                                height 15
+                                bottom FALSE
+                                top FALSE
+                                side TRUE
+                            }
+                            appearance Appearance{
+                                material Material{
+                                    diffuseColor 0.8 0.8 1
+                                    shininess 0.5
+                                }   
+                            }
+                        }
+                    ]
+            }
+            #LichtKegel
+            Transform{
+                translation 0 15.3 0
+                children[
+                    #Licht
+                    SpotLight{
+                        on IS lightOn
+                        intensity 1
+                        ambientIntensity 0 
+                        color 0.6 0.6 0.4
+                        location 0 0 0
+                        attenuation 1 0 0
+                        direction 0 -1 0
+                        beamWidth 1.57
+                        cutOffAngle 1
+                        radius 100
+                    }
+                    #Glühbirne
+                    Shape{
+                        geometry Sphere {
+                            radius 0.2
+                        }
+                        appearance Appearance{
+                            material Material{
+                                emissiveColor 0.8 0.8 0.4
+                            }   
+                        }
+                    }
+                    #LichtKegel
+                    Transform{
+                        translation 0 -7.5 0
+                        children[
+                            Shape{
+                                geometry Cone {
+                                    bottomRadius 24
+                                    height 15.3
+                                    bottom FALSE
+                                    side TRUE
+                                }
+                                appearance Appearance{
+                                    material Material{
+                                        diffuseColor 1 1 0.4
+                                        transparency IS kegelTransparenz
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+
+            #Laterne Oberer Fancy
+            Transform{
+                translation 0 15 0
+                children[
+                    #Boden Teil
+                    Transform{
+                        rotation 1 0 0 3.1415
+                        children[
+                            Shape{
+                                geometry Cone {
+                                    bottomRadius 0.3
+                                    height 0.4
+                                    bottom TRUE
+                                    side TRUE
+                                }
+                                appearance Appearance{
+                                    material Material{
+                                        diffuseColor 0.8 0.8 1
+                                        shininess 0.5
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                    #Deckel Teil
+                    Transform{
+                        translation 0 1.3 0
+                        children[
+                            Transform{
+                                translation 0 0.25 0
+                                children[
+                                    Shape{
+                                        geometry Sphere {
+                                            radius 0.1
+                                        }
+                                        appearance Appearance{
+                                            material Material{
+                                                diffuseColor 0.8 0.8 1
+                                                shininess 0.5
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                            # Shape{
+                            #     geometry Cone {
+                            #         bottomRadius 0.6
+                            #         height 0.5
+                            #         bottom TRUE
+                            #         side TRUE
+                            #     }
+                            #     appearance Appearance{
+                            #         material Material{
+                            #             diffuseColor 0.8 0.8 1
+                            #             shininess 0.5
+                            #         }
+                            #     }
+                            # }
+                        ]
+                    }
+                    #StrebenVerbindungen
+                    DEF Strebe Transform{
+                        translation 0 0.65 -0.4
+                        rotation 1 0 0 -0.3
+                        center 0 0 0
+                        children[
+                            Shape{
+                                geometry Cylinder {
+                                    radius 0.02
+                                    height 0.9
+                                    bottom FALSE
+                                    top FALSE
+                                    side TRUE
+                                }
+                                appearance Appearance{
+                                    material Material{
+                                        diffuseColor 0.8 0.8 1
+                                        shininess 0.5
+                                    }
+                                }
+                            }
+                        ]
+                    }
+
+                    Transform {
+                        rotation 0 1 0 1.04716
+                        children[
+                            USE Strebe
+                        ]                        
+                    }
+
+                    Transform {
+                        rotation 0 1 0 2.0943
+                        children[
+                            USE Strebe
+                        ]                        
+                    }
+
+                    Transform {
+                        rotation 0 1 0 3.1415
+                        children[
+                            USE Strebe
+                        ]                        
+                    }
+
+                    Transform {
+                        rotation 0 1 0 4.1886
+                        children[
+                            USE Strebe
+                        ]                        
+                    }
+
+                    Transform {
+                        rotation 0 1 0 5.2358
+                        children[
+                            USE Strebe
+                        ]                        
+                    }
+                ]
+            }
+            #Lichtkegel einfügen
+        ]
+    }
+}
