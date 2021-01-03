@@ -18,6 +18,18 @@ Viewpoint {
 }
 
 Viewpoint {
+	description "Gerade2"
+	position 20 20 0
+    orientation 0 1 0 1.5707963267948966
+}
+
+Viewpoint {
+	description "Gerade3"
+	position -100 20 0
+    orientation 0 -1 0 1.5707963267948966
+}
+
+Viewpoint {
 	description "Vogel"
 	position 0 100 0
 	orientation -1 0 0 1.5707963267948966
