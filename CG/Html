@@ -1,0 +1,399 @@
+<head>
+  <meta charset="utf-8">
+  <title>G19_A_1194577 - Computergrafik ist toll!!!</title>
+
+
+  <!-- Hier steht der Quellcode des Vertex-Shaders -->
+  <script id="vertex-shader" type="x-shader/x-vertex">
+
+// hier werden die Attribute-Variablen angelegt, diese
+// werden bei jedem Aufruf des Vertex-Shaders mit den
+// Werten für den einzelnen Vertex vorbelegt
+
+// Objektkoordinate des Vertex
+attribute  vec4 vPosition;
+
+// Normale des Vertex (in Objektkoordinaten)
+attribute  vec3 vNormal;
+
+// Farbe des Vertex (für den Fall, dass keine 
+// Beleuchtungsrechnung durchgeführt wird
+attribute  vec4 vColor;
+
+// Im Vertex-Shader wird ein Farbwert ermittelt und an
+// den Fragment-Shader übergeben
+varying vec4 fColor;
+
+// in den Uniform-Variablen stehen die Werte, die von
+// außen (d.h. der CPU-Seite) übergeben werden und für
+// alle Eckpunkte gleich sind
+
+// Flag, ob Beleuchtungsrechnung durchgeführt werden soll
+uniform bool lighting;
+
+// Vorberechnung zur Beleuchtungsrechnung
+uniform vec4 diffuseProduct;
+uniform vec4 ambientProduct;
+uniform vec4 specularProduct;
+uniform float shininess;
+
+// Position der Lichtquelle
+uniform vec4 lightPosition;
+
+// Model-Matrix (für Transformation Objektkoordinaten zu
+// Weltkoordinaten)
+uniform mat4 modelMatrix;
+
+// View-Matrix (für Transformation Weltkoordinaten zu
+// Kamerakoordinaten)
+uniform mat4 viewMatrix;
+
+// Projection-Matrix (für Transformation Kamerakoordinaten zu
+// Clippingkoordinaten)
+uniform mat4 projectionMatrix;
+
+// Projection-Matrix (für Transformation der Normalen zu
+// Kamerakoordinaten)
+uniform mat4 normalMatrix;
+
+// passthrough texCoord
+attribute vec2 a_texcoord;
+varying vec2 vTexCoord;
+
+void main()
+{
+  if (lighting) {
+    // Beleuchtungsrechnung durchführen
+
+  
+    // Position Eckpunkt in Viewkoordinaten berechnen	
+    vec3 pos = (viewMatrix * modelMatrix * vPosition).xyz;
+    
+    // Position der Lichtquelle
+    vec3 light = (viewMatrix * lightPosition).xyz;
+
+    // Vektor der Länge 1 vom Eckpunkt zur Lichtquelle	
+    vec3 E = normalize( light - pos );
+
+    // Normale am Eckpunkt in Weltkoordinaten berechnen   
+    vec3 N = (normalMatrix * vec4(vNormal, 0.0)).xyz;
+    N = normalize(N);
+
+    // Berechnung der diffusen Beleuchtung nach den Formeln von Phong
+    float Kd = max( dot(E, N), 0.0 );
+    vec3  diffuse = Kd*diffuseProduct.rgb;
+
+    // Berechnung der spekularen Beleuchtung nach den Formeln von Phong-Blinn
+    vec3 V = normalize(-pos); // entgegeggesetzter View-Vektor
+    vec3 H = normalize(E+V); // halbvektor
+    float Ks = pow( max(dot(N, H), 0.0), shininess); // (cos)^sigma
+    vec4  specular = Ks*specularProduct;
+    if(dot(E, N) < 0.0) {
+      specular = vec4(0.0,0.0,0.0,1.0);
+    }
+
+    // resultierende Farbe für Fragment-Shader bestimmen
+    fColor = vec4(ambientProduct.xyz + diffuse.xyz + specular.xyz, 1.0); // I_Phong
+	
+ } else {
+
+    // keine Beleuchtungsrechnung durchführen
+
+    // der übergebene Farbwert wird einfach an Fragment-Shader
+    // weiter gereicht
+    fColor = vColor;
+
+ }
+
+  // Pass the texcoord to the fragment shader.
+  vTexCoord = a_texcoord;
+
+  // 	schließlich muss wie in jedem Vertex-Shader die
+  // die Koordinate des Eckpunkts in Clipping-Koordinaten
+  // umgerechnet werden. Das Ergebnis ist in die vordefinierte
+  // Variable gl_Position zu schreiben
+  gl_Position = projectionMatrix * viewMatrix * modelMatrix * vPosition;
+
+}
+</script>
+
+  <!-- und hier der Quellcode für den Fragment-Shader -->
+
+  <script id="fragment-shader" type="x-shader/x-fragment">
+
+// Bitgröße von float definieren
+precision mediump float;
+
+// Werte, die vom Vertex-Shader übergeben und in der 
+// Rasterisierung für das aktuelle Fragment errechnet wurden
+
+// hsrm.gif textur
+uniform sampler2D src;
+// Passed in from the vertex shader.
+varying vec2 vTexCoord;
+// textureBlend
+uniform float textureBlend;
+//cartoon
+uniform float cartoonDarkThreshold;
+uniform float cartoonLightThreshold;
+
+
+// Farbwert für das Fragment
+varying vec4 fColor;
+
+void main()
+{
+  // wie jeder Fragment-Shader muss der Farbwert des
+  // Fragments bestimmt und in die vordefinierte Variable
+  // gl_FragColor geschrieben werden
+  vec4 textureColor = texture2D(src, vTexCoord);
+  float H2 = (max(max(fColor.x, fColor.y), fColor.z) + min(min(fColor.x, fColor.y), fColor.z)) / 2.0;
+  vec4 color = mix(fColor, vec4(textureColor.x * H2, textureColor.y * H2, textureColor.z * H2, 1.0), textureBlend);
+  if(cartoonDarkThreshold != -1.0 && cartoonLightThreshold != -1.0) {
+    // do cartoon shading
+    float H = (max(max(color.x, color.y), color.z) + min(min(color.x, color.y), color.z)) / 2.0;
+    if(H < cartoonDarkThreshold) {
+      color = vec4(0.2, 0.2, 0.2, 1.0);
+    } else if(H > cartoonLightThreshold) {
+      color = vec4(0.9, 0.7, 0.0, 1.0);
+    } else {
+      color = vec4(0.6, 0.4, 0.1, 1.0);
+    }
+  }
+  gl_FragColor = color;
+
+}
+
+</script>
+
+  <!-- in diesem Schritt stehen ein paar Hilfsfunktionen zu
+WebGL -->
+  <script type="text/javascript" src="./Common/webgl-utils.js"></script>
+
+  <!-- dieses Skript enthält Funktionen, um die Shader zu
+kompilieren und zu einem Programm zu linken -->
+  <script type="text/javascript" src="./Common/initShaders.js"></script>
+
+  <!-- dieses Skript enthält Hilfsfunktionen für das Rechnen mit
+Vektoren und Matrizen in Javascript -->
+  <script type="text/javascript" src="./Common/MV.js"></script>
+
+  <!-- dies ist unser eigentliches Skript, in dem der Code für die "CPU-Seite" steht -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- requires JQ -->
+  <script type="text/javascript" src="teapot.js"></script>
+  <script type="text/javascript" src="G19_A_1194577.js"></script>
+
+  <!-- UI-nicensing -->
+  <style>
+    * {
+      font-family: Tahoma, Verdana, sans-serif;
+      color: #fff;
+      outline: none;
+    }
+    body {
+      background-color: #222222;
+    }
+    h1 {
+      text-align: center;
+    }
+    body > *:not(:last-of-type) {
+      margin-bottom: 2rem;
+    }
+    button {
+      appearance: none;
+      background: #ffffff22;
+      border: none;
+      padding: .2em .6em;
+      width: 100%;
+      cursor: pointer;
+      border: transparent 1px solid;
+      transition: ease 200ms;
+    }
+    button.active {
+      border-color: #00ff00;
+      box-shadow: 0px 0px 2.5px #00ff00;
+    }
+    button:hover {
+      background: #ffffff44;
+    }
+    .canvasWrapper {
+      position: relative;
+      margin: 1em auto;
+      width: fit-content;
+    }
+    .canvasWrapper #fps {
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: #000;
+      margin: 0 0 0 .2em;
+    }
+    table {
+      padding: .2em 1em;
+      border: none;
+      position: relative;
+    }
+    table:not(:last-of-type):after {
+      content:"";
+      border-right: 1px #ffffff44 solid;
+      position: absolute;
+      height: 11.6em;
+      top: 0;
+      right: 0;
+    }
+    table tr {
+      height: 1.6em;
+    }
+    .controls {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
+    .controls>* {
+      height: 100%;
+    }
+input[type=range] {
+  width: 100%;
+  margin: 2.5px 0;
+  background-color: transparent;
+  -webkit-appearance: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  background: rgba(255, 255, 255, 0.2);
+  border: 0;
+  width: 100%;
+  height: 3px;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  margin-top: -4px;
+  width: 10px;
+  height: 10px;
+  background: #00ff00;
+  border: 1px solid #ffffff44;
+  box-shadow: 0px 0px 1px #00ff00;
+  border-radius: 2px;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+  </style>
+
+</head>
+
+<body>
+  <!-- Hier stehen die GUI-Elemente -->
+
+  <!--<div>
+  <table>
+    <tr><td rowspan="5"><select id="Cameralist" size="5">
+      <option selected value=0>Originalkamera</option> 
+      <option value=1>x-Achse</option> 
+      <option value=2>y-Achse</option> 
+      <option value=3>z-Achse</option> 
+      <option value=4>Pyramidenspitze</option> 
+      </select></td>
+      <td><button id = "ButtonT">Rotate On/Off</button></td>
+      <td><button id = "ButtonC">Cartoon On/Off</button></td>
+    </tr>
+    <tr>
+      <td><button id = "ButtonX">Rotate X</button></td>
+      <td><input type="range" min="0" max="1" step="0.01" value=".75" id="thresholdLight"/></td>
+      <td><input type="range" min="0" max="1" step="0.01" value=".4" id="ambient"/></td>
+    </tr>
+    <tr>
+      <td><button id = "ButtonY">Rotate Y</button></td>
+      <td><input type="range" min="0" max="1" step="0.01" value=".3" id="thresholdDark"/></td>
+      <td><input type="range" min="0" max="300" step="2" value="200" id="shininess"/></td>
+    </tr>
+    <tr>
+      <td><button id = "ButtonZ">Rotate Z</button></td>
+    </tr>
+  </table>
+</div>-->
+<h1>G19_A_1194577</h1>
+  <div class="controls">
+    <table>
+      <tbody><tr>
+        <th>Kamera</th>
+      </tr>
+      <tr>
+        <td><button value="0" class="cameraControls active">Originalkamera</button></td>
+      </tr>
+      <tr>
+        <td><button value="1" class="cameraControls">x-Achse</button></td>
+      </tr>
+      <tr>
+        <td><button value="2" class="cameraControls">y-Achse</button></td>
+      </tr>
+      <tr>
+        <td><button value="3" class="cameraControls">z-Achse</button></td>
+      </tr>
+      <tr>
+        <td><button value="4" class="cameraControls">Pyramidenspitze</button></td>
+      </tr>
+    </tbody></table>
+    <table>
+      <tbody><tr>
+        <th>Rotation</th>
+      </tr>
+      <tr>
+        <td><button id="ButtonT">Scene Rotation</button></td>
+      </tr>
+      <tr>
+        <td><button id="ButtonX" class="active">Rotate X</button></td>
+      </tr>
+      <tr>
+        <td><button id="ButtonY">Rotate Y</button></td>
+      </tr>
+      <tr>
+        <td><button id="ButtonZ">Rotate Z</button></td>
+      </tr>
+    </tbody></table>
+    <table>
+      <tbody><tr>
+        <th colspan="2">Cartoon</th>
+      </tr>
+      <tr>
+        <td colspan="2"><button id="ButtonC" class="active">Cartoon Shading</button></td>
+      </tr>
+      <tr>
+        <td>Threshold Hell</td>
+        <td><input type="range" min="0" max="1" step="0.01" value=".75" id="thresholdLight"></td>
+      </tr>
+      <tr>
+        <td>Threshold Dunkel</td>
+        <td><input type="range" min="0" max="1" step="0.01" value=".3" id="thresholdDark"></td>
+      </tr>
+    </tbody></table>
+    <table>
+      <tbody><tr>
+        <th colspan="2">Beleuchtung</th>
+      </tr>
+      <tr>
+        <td>Ambient Intensity</td>
+        <td><input type="range" min="0" max="1" step="0.01" value=".4" id="ambient"></td>
+      </tr>
+      <tr>
+        <td>Shininess</td>
+        <td><input type="range" min="0" max="300" step="2" value="200" id="shininess"></td>
+      </tr>
+    </tbody></table>
+  </div>
+
+  <div>
+  </div>
+
+  <!-- Hier wird der Bereich im Browser angelegt, in den gezeichnet wird -->
+  <div class="canvasWrapper">
+    <label id="fps">FPS: 48</label>
+    <canvas id="gl-canvas" width="600" height="600">
+      The HTML 5 Canvas is not supported by your browser. Please use another browser to view this page.
+    </canvas>
+  </div>
+  <img id="texImage" src="data:image/gif;base64,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" alt="" hidden="">
+  <img id="texImage_" src="data:image/gif;base64,R0lGODlhAAEAAXAAACH5BAEAAI0ALAAAAAAAAQABh/////7+/t7e3u/v7/f398nJyWhoaFZWVtzc3AAAAPj4+N3d3VdXV1hYWN/f3woKCgUFBS8vLz8/PwICAiIiIikpKTMzM39/f3t7ewEBAXx8fCsrK4eHh+3t7YKCgmdnZ/39/YSEhImJiXl5efn5+fT09JOTkwcHB2xsbPz8/G5ubvv7+5SUlIaGhoiIiHh4eGlpafb29oyMjAMDA4CAgPr6+vX19Y+Pj4ODg2tra3Nzc/Pz8wgICIGBgWpqasrKym9vbwYGBsvLy4qKiszMzJCQkIWFhXJycnZ2ds3NzY2NjQQEBHd3d87OznFxcW1tbZGRkc/Pz35+fpKSknV1dXp6evDw8HR0dPLy8gkJCezs7GVlZY6OjmRkZOvr6+7u7pWVlV5eXmNjY3BwcGZmZunp6VtbW4uLi+bm5llZWejo6F9fX+Xl5fHx8V1dXVVVVerq6lpaWlFRUeTk5DU1NVRUVKKiopaWlpmZmZqampycnJiYmJeXl56engsLCwwMDJ+fn6CgoA0NDZ2dnZubm6GhoRAQEBISEg8PDw4ODhwcHNjY2KWlpQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAj/AAEIHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuXMGPKnEmzps2bOHPq3Mmzp8+fQIMKHUq0qNGjSJMqXcq0qdOnUKNKnUq1qtWrWLNq3WoygIABBLiKFRqggIEDCMKOXbuzrIEECdCqZUuXplu4cNEqqMsX5l28eRfs7Us45V/AcBkILsyY5GHEiRc3ntzxMeTIgylrtmj5MubNoCV29pxYQObQqBOOJl36dOrXAlezbg27tuzZcBs4cF1b823cuXf3Bv0beHDew/sWN348OePlzJs75ws9uvTpa6tbv459q/bt3LtfPf0OPrz4qeTLmz//NL369eyXun8PP/7R+fTr2x+KP7/+/T/1599/ALZl1oAD6oZcgTwJiCBeCjIIlIMPQij/nIQNHljhgxFimBOFGwLWoYc1gRiiiBeSKJOJJ6K4oIqGadhiiCPCuBKLMyJWo40n4ZijjinyWJKPPwL5opAcEVmkkUiKpOSSTDbp0ZNQRimlRlRWaeWVnMmo5ZI7chlRll9CFqaYDZFZpplBosmQmmuyeaSbA8EZp5x0KqTkA/lB0OKZeSoZgQQT0EdBBX+2GaiXFVpwAQYZ0KfBBRskOmeTSlrAQQce5PcBCCFUeiKgUma6qQIi5DcCCQCEaimdpnYAQAkmnEBfCKy2KiqNiiIZ60Ah5IdCCsDuuiGpKv4qEKj5qbACQa6O2muyjD6oqawDlcCCre+1kGuxrwqp/+xAJLiQ3wvPFhQtr5faNy5BndIHAwgHrXvstAC+O1AMMsxAHw01IGRvhciyp+9ANtzg53s4BCywsQTje97BBOGQXw70JjQwhxJjR/FAK7SQnw7pagwxx+329vFAO7DAA30cOKzQxggWrHK1CF7LUMgjlzzzyTV3DNvKBVlMH8YO0Zyg0KgRTVDCC6sXgswMKe2fzcThPKDODvFb6Hs9+Fw10EunPJnTBsX7ng8ZP2R1flg3hnZBCphL3whiN/Q2fXETFsAPb53INUTacqueC1S7TfbVTCv3AwwtDg5RAMHSBwSxE+39Xt9s/Q254JtWZPR7KmCe+eJwN57d45GHTkARrUHAnHhEmqvHuXdCfB6i5BKhmp8GedOOOt+qaxVA7q1ja5Ha6rGNUe3l3W7V8bpvyPtEMQwR6XsXBC8R9OBJ/48eET4kn1EJRcT+nhHefz/85sWPXz7oymM0unpIawT+duI7FQD55tNICoyQnyOYLiP7s07/5ANA+nGkZS97jwvaR5EERmeBSPlfDgK4kRqIjD5IOKD+3me7+ClFgxzkCPPKk7+OWJA5GORPEjboQI/YQAlLoA8OKGiRFxonhhOaYQo5csMcMoyHPSRh9EwoQxruznUgWSF4nBcSHwIHiG0RYg1BQgIO5IcJIvSIFXGDRZwEoAlOtB4UQQJB+kyQJGOcTRlL1AQUDPEjKajce5wQxo/EkTVzXFEd7wiS+5XnCW0byR9JE8iXnNGOWxxJCaCgPvW0AIkbWaRnGsmSR/8SEiQEGEJ+uocSTV6Gk4YZZCRLIsXt+CAAKTElnogSgChA8on1KwkBUkUfKWDShUoMnwNm95MpfFIkk6xked6oElkihgqJBIoNqhDBRq0RJYYEDxCieRJn4mUEViAKATCgzK1d8yTMog8fW+LNBFwhnETRgBpziZKWGa48IvglSLz5AVgOZQUY+Jo56YmSLqqqj6UMpnFQgAWi7KAKWcjZOVXSSuugwJ8uMWUGrqCFomBAogRNCb/8tT6ExlKhs9mCDTw60JjYgAtGVA8HTHrSAXVhLkEpAUTzc72WZHM7KuAmO1HqGRV4gSgkwEBMy9NTltTAi/R5AU2bSVTIbOH/Cyx9T1NZUgIwVLM8MpgqVekThqIooApR285WWcIzEIp1rOoRQ0h5otOvRmetPqVPBsYgVJhYkQxlyKpaJwoTG6SPPkN460p8aAacBuWjg53rS2JwBoGWxwiKXWxVzdDQoexgBBG9K2FlUlHmZAAIGL1JAjMgBjQQJQWQZQ5eX+K792SABpllSQLNgFWiVEG0ko1J4egTVp7sLw36rIkNmHBP1szWL3osTwag2RPwhUENRLHBFcrpmedClz4TQEJfbQK96xYFCcDxLkyG+x4u5PYltWNAcmmSAh3gRr0wqa16JuCB8ar2fWkIbk6w4AO7Iga/MSmtcSZwhNRWF3UZeVgDG4oyBueOFieUtex2MuCC98bkbQxoA4VJg2CXHlY9GVCChz+8uAPEgChYIENz4VJimfw0OjOg7lCU5gbXDoUABlgqjS+sk7aqZwYa8O9OaMaAwBLllnipsUzaiOIirHgmG3uDWbtA0iELWCdPpc8MpKBk40KMAXD/IEob4lBJKdPkxszJsYN3bCwzTJgoZIgykXvyUiFbZwJcKPOD8fKGEhSlC15OykjfMwEZCHrQCXhDZ4UyADkEwc02UTBwloCEORclVBmIwxyIUgM30GHPPzHoe2aAg0f7JFR1OCpR7IDqn9jTtlNw9atF4OmegGAHhmZKOtWzhCT7zyi9PgqcjbOEKiQ7T0VJJqNzDe2m7FLMItB1tXuiadxAgAnP3nZQQkmfJZxB2+LOibT3S+10J2XZwIEABsLt7p7kkT4QuAC9670TKkuXBejmN01UrR4ItCDgAp9Jt2cTBGcnPLs4XDUUEP7wlxRx1e2ueFAWzpogaGDfGqeJ6AfpEwQOgDzkU3aZbe9AcZSrZIAkD8HJXQ4TeOPmBFKYOc1bgj7u4hgMLd+5SbK3vfJAAAo6F/pKOE4aHuRc6TrRb3mCcIOkQ/0ksFs1Hqx+dZPYfDY8wAHXuz4SytGHBzInu03YW54J5GHsagdJ3ehzgqrHvSZM90wWegD3u3fEa+8Jwh367veNGDat21nC1gsvk+iCJwseIDzjMWLk8vDgDJKfvEW6auDoTEAPmdc8RVYAVfXwQAahF33m6PMAI6Re9RCxARQQbx0IvB32K4kBF7oMniDs4fW4Txrr0x78goryPTwwAfD/i6+QEvBhxjjuw/KZjxAQlL48DzgD9VHyQfX4YQjbN4kN7gB95iyhD+EviQKUcHY+pL8kBHzPH1rw/pEQQAlFBw8P8lB/kdgADD7HHBAACP0nEt1XHn8AfgWIR3bjfTewgB9RAnjQeXEWCBDoETVwBqxnAhfoEfGnHoIgAh3IETEwBX4WHScwCCO4ETFgAifIHCm4ghtxgOAhCC4ggxmRgazHAjiIETagBxRoHDNggT1oESnAS+rxBw9YhBZxfTWofUxIETawB+VnHAMYhRShAEWQf9uRBfyHhRPhhNsRgmDYO0VAH1mAB2UYETZACFUYb0S4hg+BhOUhCEoghw8B1gLHl4RcgIcOYQOD8Ia4sQSF4IcNQQI3wHruZ4gM0YB1KIKMqBAEAAa8tx08oIKRmBAxsAe0h4Lol4kJQYdPCIoIsQJcQB9+wIOkaBA2EAhBCBwzYAeraBApwH7yx4GzWBB7WIcykIsEEQN60IkwGIe+qAB3oGHWkQWY6IsCMQSGMAOGcAg84AeHIAgQgAiIsAR/YAhZcAKJIAgT8AeJcAI8oAhQyIwksAiEwAh4MAWFAAg3oAd2AAVQUAh4cAaE0AdnAAWAMAUioAd5cHDMOJAEWZAGeZAsCJmQCrmQDNmQDvmQEBmREjmRFFmRFnmRGJmRGrmRHNmRHvmRIBmSIukRAQEAOw==" alt="" hidden="">
+
+
+
+</body>
