@@ -1,0 +1,36 @@
+Bewertungsbogen Blatt 4
+
+Name: FIXME                            Ihre Punkte -------------.
+                                       moegliche Punkte ----.    \
+                                                             \    \
+                                                              v    v
+4.1 (a) db_stress.c
+        Ausgaben                                              1 /  1
+4.1 (c) Signale bei Transaktion mit sigprocmask() maskiert    2 /  2
+4.1 (d) Signale korrekt aufsetzen                             3 /  3
+        Signal SIGINT abgefangen                              1 /  1
+4.1 (e) Signal SIGUSR1 abgefangen                             1 /  1
+4.1 (f) Periodischer Timer                                    1 /  1
+        Signal SIGALRM abgefangen                             1 /  1
+4.1 (g) Signale waehrend der Ausfuehrung der Handler maskiert 1 /  1
+
+4.2     filter.c
+        Pipe korrekt umgesetzt                                5 /  5
+        fork/execve korrekt umgesetzt                         4 /  4
+        Warten auf die Kinder korrekt umgesetzt               1 /  1
+
+Abzuege bei fehlender Return-Code-Behandlung                 -3 /  0
+Abzuege bei Compiler-Warnungen                               -3 /  0
+Abzuege Lesbarkeit                                           -3 /  0
+
+Gesamtpunkte:                                 maximal 20 von 21 / FIXME
+
+Compiler-Warnungen:
+
+Fehlerbehandlung:
+
+Signale:
+
+Filter:
+
+Coding-Style:

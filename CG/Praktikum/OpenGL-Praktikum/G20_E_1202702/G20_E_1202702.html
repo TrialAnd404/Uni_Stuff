@@ -1,0 +1,249 @@
+<!-- 
+
+HTML-Seite zum OpenGL-Praktikum
+
+Lehrveranstaltung Computergraphik
+
+HS RheinMain
+
+Prof. Dr. Ralf D�rner
+
+-->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Computergraphik ist toll!!!</title>
+ 
+
+<!-- Hier steht der Quellcode des Vertex-Shaders -->
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+  // hier werden die Attribute-Variablen angelegt, diese
+  // werden bei jedem Aufruf des Vertex-Shaders mit den
+  // Werten für den einzelnen Vertex vorbelegt
+  
+  // Objektkoordinate des Vertex
+  attribute  vec4 vPosition;
+  
+  // Normale des Vertex (in Objektkoordinaten)
+  attribute  vec3 vNormale;
+  
+  // Farbe des Vertex (für den Fall, dass keine 
+  // Beleuchtungsrechnung durchgeführt wird
+  attribute  vec4 vColor;
+  
+  // Im Vertex-Shader wird ein Farbwert ermittelt und an
+  // den Fragment-Shader übergeben
+  varying vec4 fColor;
+  
+  // in den Uniform-Variablen stehen die Werte, die von
+  // außen (d.h. der CPU-Seite) übergeben werden und für
+  // alle Eckpunkte gleich sind
+  
+  // Flag, ob Beleuchtungsrechnung durchgeführt werden soll
+  uniform bool lighting;
+  
+  // Vorberechnung zur Beleuchtungsrechnung
+  uniform vec4 diffuseProduct;
+  uniform vec4 ambientProduct;
+  uniform vec4 specularProduct;
+  uniform float shininess;
+  
+  // Position der Lichtquelle
+  uniform vec4 lightSource;
+  
+  // Model-Matrix (für Transformation Objektkoordinaten zu
+  // Weltkoordinaten)
+  uniform mat4 mModel;
+  
+  // View-Matrix (für Transformation Weltkoordinaten zu
+  // Kamerakoordinaten)
+  uniform mat4 mView;
+  
+  // Projection-Matrix (für Transformation Kamerakoordinaten zu
+  // Clippingkoordinaten)
+  uniform mat4 mProjection;
+  
+  // Projection-Matrix (für Transformation der Normalen zu
+  // Kamerakoordinaten)
+  uniform mat4 mNormale;
+  
+  // passthrough texCoord
+  attribute vec2 a_texcoord;
+  varying vec2 vTexCoord;
+void main()
+{
+  if (lighting) {
+    // Beleuchtungsrechnung durchführen
+
+  
+    // Position Eckpunkt in Viewkoordinaten berechnen	
+    vec3 pos = (mView * mModel * vPosition).xyz;
+    
+    // Position der Lichtquelle
+    vec3 light = (mView * lightSource).xyz;
+
+    // Vektor der Länge 1 vom Eckpunkt zur Lichtquelle	
+    vec3 E = normalize( light - pos );
+
+    // Normale am Eckpunkt in Weltkoordinaten berechnen   
+    vec3 N = (mNormale * vec4(vNormale, 0.0)).xyz;
+    N = normalize(N);
+
+    // Berechnung der diffusen Beleuchtung nach den Formeln von Phong
+    float Kd = max( dot(E, N), 0.0 );
+    vec3  diffuse = Kd*diffuseProduct.rgb;
+
+    // Berechnung der spekularen Beleuchtung nach den Formeln von Phong-Blinn
+    vec3 V = normalize(-pos); // entgegeggesetzter View-Vektor
+    vec3 H = normalize(E+V); // halbvektor
+    float Ks = pow( max(dot(N, H), 0.0), shininess); // (cos)^sigma
+    vec4  specular = Ks*specularProduct;
+    if(dot(E, N) < 0.0) {
+      specular = vec4(0.0,0.0,0.0,1.0);
+    }
+
+    // resultierende Farbe für Fragment-Shader bestimmen
+    fColor = vec4(ambientProduct.xyz + diffuse.xyz + specular.xyz, 1.0); // I_Phong
+	
+ } else {
+
+    // keine Beleuchtungsrechnung durchführen
+
+    // der übergebene Farbwert wird einfach an Fragment-Shader
+    // weiter gereicht
+    fColor = vColor;
+
+ }
+
+  // Pass the texcoord to the fragment shader.
+  vTexCoord = a_texcoord;
+
+  // 	schließlich muss wie in jedem Vertex-Shader die
+  // die Koordinate des Eckpunkts in Clipping-Koordinaten
+  // umgerechnet werden. Das Ergebnis ist in die vordefinierte
+  // Variable gl_Position zu schreiben
+  gl_Position = mProjection * mView * mModel * vPosition;
+
+}
+</script>
+
+
+<!-- und hier der Quellcode f�r den Fragment-Shader -->
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+  // Bitgröße von float definieren
+  precision mediump float;
+  
+  // Werte, die vom Vertex-Shader übergeben und in der 
+  // Rasterisierung für das aktuelle Fragment errechnet wurden
+  
+  // die textur
+  uniform sampler2D textur;
+
+  // Passed in from the vertex shader.
+  varying vec2 vTexCoord;
+
+  // blendMe
+  uniform float blendMe;
+  
+  //cartoon Müll
+  uniform float cartoonDark;
+  uniform float cartoonLight;
+  
+  
+  // Farbwert für das Fragment
+  varying vec4 fColor;
+
+void main()
+{
+  // wie jeder Fragment-Shader muss der Farbwert des
+  // Fragments bestimmt und in die vordefinierte Variable
+  // gl_FragColor geschrieben werden
+  vec4 textureColor = texture2D(textur, vTexCoord);  
+  vec4 color = mix(fColor, textureColor, blendMe);
+  
+  if(cartoonDark != -1.0 && cartoonLight != -1.0) {
+    // do cartoon shading
+    float H = (max(max(color.x, color.y), color.z) + min(min(color.x, color.y), color.z)) / 2.0;
+    
+    if(H < cartoonDark) {
+      color = vec4(0.2, 0.2, 0.2, 1.0);
+      
+    } else if(H > cartoonLight) {
+      color = vec4(0.9, 0.7, 0.0, 1.0);
+      
+    } else {
+      color = vec4(0.6, 0.4, 0.1, 1.0);
+      
+    }
+    
+  }
+  gl_FragColor = color;
+
+}
+
+</script>
+
+<!-- in diesem Schritt stehen ein paar Hilfsfunktionen zu
+WebGL -->
+<script type="text/javascript" src="./Common/webgl-utils.js"></script>
+
+<!-- dieses Skript enth�lt Funktionen, um die Shader zu
+kompilieren und zu einem Programm zu linken -->
+<script type="text/javascript" src="./Common/initShaders.js"></script>
+
+<!-- dieses Skript enth�lt Hilfsfunktionen f�r das Rechnen mit
+Vektoren und Matrizen in Javascript -->
+<script type="text/javascript" src="./Common/MV.js"></script>
+
+<!-- dies ist unser eigentliches Skript, in dem der Code f�r
+die "CPU-Seite" steht -->
+<script type="text/javascript" src="G20_E_1202702.js"></script>
+
+<!-- Teapot Skript einbinden -->
+<script type="text/javascript" src="teapot.js"></script>
+
+
+</head>
+
+<body>
+<!-- Hier stehen die GUI-Elemente -->
+
+<div>
+  <h1>G20_E_1202702</h1>
+<img id="texImage" src="data:image/gif;base64,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" alt="" hidden="">
+<label id="fps">FPS</label>
+</div>
+
+<div>
+<select id="Cameralist" size="5"> 
+<option selected value=0>Originalkamera</option> 
+<option value=1>x-Achse</option> 
+<option value=2>y-Achse</option> 
+<option value=3>z-Achse</option> 
+<option value=4>Pyramidenspitze</option> 
+</select> 
+</div>
+
+<div>
+<button id = "ButtonX">Rotate X</button>
+<button id = "ButtonY">Rotate Y</button>
+<button id = "ButtonZ">Rotate Z</button>
+<button id = "ButtonT">Rotate On/Off</button>
+<button id = "ButtonCartoon">Cartoon On/Off</button>
+</div>
+
+<!-- Hier wird der Bereich im Browser angelegt, in den gezeichnet wird -->
+
+<canvas id="gl-canvas" width="600" height="600">
+The HTML 5 Canvas is not supported by your browser. Please use another browser to view this page.
+</canvas>
+
+</body>
+
+</html>

@@ -1,0 +1,752 @@
+// aktives Element aus der Kameraauswahlliste
+var camIndex = 0;
+
+// Schalter für Gesamtrotation der Szene
+var rotationOn = false;
+// "timer" für Eigenrotation der Objekte
+var intrinsicRotation = 0;
+
+// Cartoonshading schalter und slider
+var cartoonOn = true;
+var cartoonLightThreshold = .75;
+var cartoonDarkThreshold = .3;
+
+//Ambientlight slider
+var ambientLight = .4;
+
+//shininess slider
+var sceneShininess = 200;
+
+// aktuelle fps
+var fps = 60;
+
+
+// Referenz auf Bereich, in den gezeichnet wird
+var canvas;
+
+// Referenz auf WebGL-Kontext, über die OpenGL Befehle ausgeführt werden
+var gl;
+
+// Referenz auf die Shaderprogramme
+var program;
+
+// Matrix für die Umrechnung Objektkoordinaten -> Weltkoordinaten
+var model;
+
+// Matrix für die Umrechnung Weltkoordinaten -> Kamerakoordinaten
+var view;
+
+// Matrix für die Umrechnung Kamerakoordinaten -> Clippingkoordinaten
+var projection;
+
+// Matrix für die Umrechnung von Normalen aus Objektkoordinaten -> Viewkoordinaten
+var normalMat;
+
+// Flag, das angibt, ob eine Beleuchtungsrechnung durchgeführt wird (true)
+// oder ob einfach die übergebenen Eckpunktfarben übernommen werden (false)
+var lighting = true;
+
+// Anzahl der Eckpunkte der zu zeichenden Objekte 
+var numVertices = 0;
+
+// Array, in dem die Koordinaten der Eckpunkte der zu zeichnenden Objekte eingetragen werden
+var vertices = [];
+
+// Array, in dem die Farben der Eckpunkte der zu zeichnenden Objekte eingetragen werden
+var vertices = [];
+
+// Array, in dem die Eckpunktkoordinaten der zu zeichnenden Objekte eingetragen werden
+var pointsArray = [];
+
+// Array, in dem die Normale je Eckpunkt der zu zeichnenden Objekte eingetragen werden
+var normalsArray = [];
+
+// Array, in dem die Farbwerte je Eckpunkt der zu zeichnenden Objekte eingetragen werden
+var colorsArray = [];
+
+// Variablen für die Drehung des Würfels
+var axis = 0;
+var theta = [0, 0, 0];
+
+// Variablen, um die Anzahl der Frames pro Sekunde zu ermitteln
+var then = Date.now();
+var counter = 0;
+
+// OpenGL-Speicherobjekt für Farben
+var nBuffer;
+
+// OpenGL-Speicherobjekt für Vertices
+var vBuffer;
+
+// OpenGL-Speicherobjekt für Normalen
+var nBuffer;
+
+// OpenGL-Speicherobjekt für TexCoord
+var tcBuffer;
+
+/*** Hilfsfunktionen zum Zeichnen von Objekten */
+
+
+//
+// Funktion, die ein Quadrat in das pointsArray, colorsArray und normalsArray einträgt
+// Das Quadrat wird dabei in zwei Dreiecke trianguliert, da OpenGL keine Vierecke 
+// nativ zeichnen kann.
+//
+// Übergeben werden für Indices auf die vier Eckpunkte des Vierecks
+//
+function quad(a, b, c, d) {
+
+	// zunächst wird die Normale des Vierecks berechnet. t1 ist der Vektor von Eckpunkt a zu Eckpunkt b
+	// t2 ist der Vektor von Eckpunkt von Eckpunkt a zu Eckpunkt c. Die Normale ist dann das 
+	// Kreuzprodukt von t1 und t2
+	var t1 = subtract(vertices[b], vertices[a]);
+	var t2 = subtract(vertices[c], vertices[a]);
+	var normal = cross(t1, t2);
+	normal = vec3(normal);
+
+	// und hier kommt die Eintragung der Infos für jeden Eckpunkt (Koordinaten, Normale, Farbe) in die globalen Arrays
+	// allen Eckpunkten wird die gleiche Farbe zugeordnet, dabei 
+
+	// erstes Dreieck
+	pointsArray.push(vertices[a]);
+	normalsArray.push(normal);
+	colorsArray.push(colors[a]);
+
+	pointsArray.push(vertices[b]);
+	normalsArray.push(normal);
+	colorsArray.push(colors[a]);
+
+	pointsArray.push(vertices[c]);
+	normalsArray.push(normal);
+	colorsArray.push(colors[a]);
+
+	// zweites Dreieck
+	pointsArray.push(vertices[a]);
+	normalsArray.push(normal);
+	colorsArray.push(colors[a]);
+
+	pointsArray.push(vertices[c]);
+	normalsArray.push(normal);
+	colorsArray.push(colors[a]);
+
+	pointsArray.push(vertices[d]);
+	normalsArray.push(normal);
+	colorsArray.push(colors[a]);
+
+	// durch die beiden Dreiecke wurden 6 Eckpunkte in die Array eingetragen
+	numVertices += 6;
+}
+
+function tri(a, b, c) {
+
+	// zunächst wird die Normale des Dreiecks berechnet. t1 ist der Vektor von Eckpunkt a zu Eckpunkt b
+	// t2 ist der Vektor von Eckpunkt von Eckpunkt a zu Eckpunkt c. Die Normale ist dann das 
+	// Kreuzprodukt von t1 und t2
+	var t1 = subtract(vertices[b], vertices[a]);
+	var t2 = subtract(vertices[c], vertices[a]);
+	var normal = cross(t2, t1);
+	normal = vec3(normal);
+
+	pointsArray.push(vertices[a]);
+	normalsArray.push(normal);
+	colorsArray.push(colors[a]);
+
+	pointsArray.push(vertices[b]);
+	normalsArray.push(normal);
+	colorsArray.push(colors[a]);
+
+	pointsArray.push(vertices[c]);
+	normalsArray.push(normal);
+	colorsArray.push(colors[a]);
+
+	numVertices += 3;
+}
+
+
+//
+// Funktion, die einen Würfel zeichnet (Mittelpunkt liegt im Ursprung, Kantenlänge beträgt 1)
+//
+function drawCube() {
+
+	// zunächst werden die Koordinaten der 8 Eckpunkte des Würfels definiert
+	vertices = [
+		vec4(-0.5, -0.5, 0.5, 1.0), // 0
+		vec4(-0.5, 0.5, 0.5, 1.0), // 1
+		vec4(0.5, 0.5, 0.5, 1.0),  // 2 
+		vec4(0.5, -0.5, 0.5, 1.0),  // 3
+		vec4(-0.5, -0.5, -0.5, 1.0), // 4
+		vec4(-0.5, 0.5, -0.5, 1.0), // 5
+		vec4(0.5, 0.5, -0.5, 1.0),  // 6
+		vec4(0.5, -0.5, -0.5, 1.0)   // 7
+	];
+
+	// hier werden verschiedene Farben definiert (je eine pro Eckpunkt)
+	colors = [
+		vec4(1.0, 0.0, 0.0, 1.0),
+		vec4(1.0, 0.0, 0.0, 1.0),
+		vec4(1.0, 0.0, 0.0, 1.0),
+		vec4(0.0, 0.0, 0.0, 1.0),
+		vec4(1.0, 0.0, 0.0, 1.0),
+		vec4(1.0, 0.0, 0.0, 1.0),
+		vec4(0.0, 0.0, 0.0, 1.0),
+		vec4(1.0, 0.0, 0.0, 1.0),
+	];
+
+	// und hier werden die Daten der 6 Seiten des Würfels in die globalen Arrays eingetragen
+	// jede Würfelseite erhält eine andere Farbe
+	quad(1, 0, 3, 2);
+	quad(2, 3, 7, 6);
+	quad(3, 0, 4, 7);
+	quad(6, 5, 1, 2);
+	quad(4, 5, 6, 7);
+	quad(5, 4, 0, 1);
+
+
+	// die eingetragenen Werte werden an den Shader übergeben
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
+
+	var vNormal = gl.getAttribLocation(program, "vNormal");
+	gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(vNormal);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
+
+	var vPosition = gl.getAttribLocation(program, "vPosition");
+	gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(vPosition);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
+
+	var cPosition = gl.getAttribLocation(program, "vColor");
+	gl.vertexAttribPointer(cPosition, 4, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(cPosition);
+
+}
+
+//
+// Funktion, die eine Pyramide zeichnet (Mittelpunkt der Grundfläche liegt im Ursprung, Kantenlänge beträgt 1)
+//
+function drawPyramid() {
+
+	// zunächst werden die Koordinaten der 8 Eckpunkte des Würfels definiert
+	vertices = [
+		vec4(-.5, 0, -.5, 1), // 0
+		vec4(.5, 0, -.5, 1), // 1
+		vec4(.5, 0, .5, 1), // 2
+		vec4(-.5, 0, .5, 1), // 3
+		vec4(0, 1, 0, 1), // 4
+	];
+
+	// hier werden verschiedene Farben definiert (je eine pro Eckpunkt)
+	colors = [
+		vec4(1.0, 0.0, 0.0, 1.0),
+		vec4(1.0, 1.0, 0.0, 1.0),
+		vec4(0.0, 1.0, 0.0, 1.0),
+		vec4(0.0, 1.0, 1.0, 1.0),
+		vec4(0.0, 0.0, 1.0, 1.0),
+	];
+
+	// und hier werden die Daten der 6 Seiten des Würfels in die globalen Arrays eingetragen
+	// jede Würfelseite erhält eine andere Farbe
+	tri(0, 1, 4);
+	tri(1, 2, 4);
+	tri(2, 3, 4);
+	tri(3, 0, 4);
+	quad(0, 1, 2, 3);
+
+
+	// die eingetragenen Werte werden an den Shader übergeben
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
+
+	var vNormal = gl.getAttribLocation(program, "vNormal");
+	gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(vNormal);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
+
+	var vPosition = gl.getAttribLocation(program, "vPosition");
+	gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(vPosition);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
+
+	var cPosition = gl.getAttribLocation(program, "vColor");
+	gl.vertexAttribPointer(cPosition, 4, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(cPosition);
+
+}
+
+
+/*** Funktionen zum Aufbau der Szene */
+
+//
+// Funktion zum setzen der inneren und äußeren Parameter der Kamera
+//
+var camPosIndex = 0;
+function setCamera() {
+
+	if (camIndex < 4)
+		camPosIndex = camIndex;
+
+	// Punkt, an dem die Kamera steht  
+	var eye;
+
+	// Punkt, auf den die Kamera schaut
+	var vrp = vec3(0, 0, 0);
+
+	// Vektor, der nach oben zeigt  
+	var upv = vec3(0.0, 1.0, 0.0);
+
+	if (camPosIndex == 0) {
+		// hier wird die erste Kameraposition definiert
+		eye = vec3(12.0, 12.0, 4.0);
+	} else if (camPosIndex == 1) {
+		eye = vec3(10, 0, 0);
+	} else if (camPosIndex == 2) {
+		eye = vec3(0, 10, 0);
+		upv = vec3(1, 0, 0);
+	} else if (camPosIndex == 3) {
+		eye = vec3(0, 0, 10);
+	}
+
+	if (camIndex == 4) {
+		vrp = mult(rotateAxis(theta),mult(translate(0,4,0), mat4()));
+		vrp = vec3(vrp[0][3], vrp[1][3], vrp[2][3]);
+		vrp.length = 4;
+		vrp.pop();
+	}
+
+	// hier wird die Viewmatrix unter Verwendung einer Hilfsfunktion berechnet,
+	// die in einem externen Javascript (MV.js) definiert wird
+
+
+
+	view = lookAt(eye, vrp, upv);
+
+	// die errechnete Viewmatrix wird an die Shader übergeben
+	// die Funktion flatten löst dabei die eigentlichen Daten aus dem Javascript-Array-Objekt
+	gl.uniformMatrix4fv(gl.getUniformLocation(program, "viewMatrix"), false, flatten(view));
+
+	// nachdem die inneren Parameter gesetzt wurden, werden nun die äußeren Parameter gesetzt
+	// dazu wird die Projektionmatrix mit einer Hilfsfunktion aus einem externen Javascript (MV.js)
+	// definiert
+	// der Field-of-View wird auf 60° gesetzt, das Seitenverhältnis ist 1:1 (d.h. das Bild ist quadratisch),
+	// die near-Plane hat den Abstand 0.01 von der Kamera und die far-Plane den Abstand 100
+	projection = perspective(60.0, 1.0, 0.01, 100.0);
+
+	// die errechnete Viewmatrix wird an die Shader übergeben
+	gl.uniformMatrix4fv(gl.getUniformLocation(program, "projectionMatrix"), false, flatten(projection));
+
+}
+
+
+//
+// die Funktion spezifiziert die Lichtquellen, führt schon einen Teil der Beleuchtungsrechnung durch
+// und übergibt die Werte an den Shader
+// 
+// der Parameter materialDiffuse ist ein vec4 und gibt die Materialfarbe für die diffuse Reflektion an
+//
+
+function calculateLights(material) {
+	/* material = {
+		ambientIntensity,
+		shininess,
+		specularColor,
+		diffuseColor
+	}
+	*/
+
+	// zunächst werden die Lichtquellen spezifiziert (bei uns gibt es eine Punktlichtquelle)
+
+	// die Position der Lichtquelle (in Weltkoordinaten)
+	var lightPosition = vec4(7.0, 7.0, 0.0, 1.0);
+
+	// die Farbe der Lichtquelle im diffusen Licht
+	var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
+
+	// die Farbe des AmbientLights
+	var ambientDiffuse = scale(ambientLight, vec4(1, 1, 1, 1));
+
+
+	// dann wird schon ein Teil der Beleuchtungsrechnung ausgeführt - das könnte man auch im Shader machen
+	// aber dort würde diese Rechnung für jeden Eckpunkt (unnötigerweise) wiederholt werden. Hier rechnen wir
+	// das Produkt aus lightDiffuse und materialDiffuse einmal aus und übergeben das Resultat. Zur Multiplikation
+	// der beiden Vektoren nutzen wir die Funktion mult aus einem externen Javascript (MV.js)
+	var diffuseProduct = mult(lightDiffuse, material.diffuseColor);
+
+	// Berechnung des Positionsunabhängigen Teils der Formel für das AmbientLight
+	var ambientProduct = scale(material.ambientIntensity, ambientDiffuse);
+
+	// Berechnung des Positionsunabhängigen Teils der Formel für das SpecularLight
+	var specularProduct = mult(lightDiffuse, material.specularColor);
+
+	// die Werte für die Beleuchtungsrechnung werden an die Shader übergeben
+
+	// Übergabe der Position der Lichtquelle
+	// flatten ist eine Hilfsfunktion, welche die Daten aus dem Javascript - Objekt herauslöst
+	gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"), flatten(lightPosition));
+
+	// Übergabe des diffuseProduct
+	gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"), flatten(diffuseProduct));
+
+	// Übergabe des ambientProduct
+	gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct));
+
+	// Übergabe des specularProduct
+	gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct));
+	// Übergabe der shininess
+	gl.uniform1f(gl.getUniformLocation(program, "shininess"), material.shininess);
+}
+
+//
+// Die Funktion setzt die Szene zusammen, dort wird ein Objekt nach dem anderen gezeichnet
+// 
+function displayScene() {
+
+	// Die Kamera für das Bild wird gesetzt
+
+	// View-Matrix und Projection-Matrix zur Kamera berechnen
+	setCamera();
+
+	addObj("cube", vec4(1, .8, 0, 1), [
+		rotateAxis(theta),
+		translate(5, 0, 1),
+		rotate(intrinsicRotation, [0, 0, 1]),
+	], false, undefined);
+	addObj("cube", vec4(0, 1, 0, 1), [
+		rotateAxis(theta),
+		translate(5, 0, -3),
+		scalem(2, 2, 2),
+		rotate(intrinsicRotation * 2, [1, 0, 0]),
+	], {
+		ambientIntensity: .4,
+		shininess: sceneShininess,
+		specularColor: vec4(1, 1, 1, 1),
+		textureBlend: .7
+	});
+	addObj("pyramid", vec4(1, .8, 0, 1), [
+		rotateAxis(theta),
+		scalem(4, 4, 2),
+	]);
+	addObj("pyramid", vec4(1, 0, 0, 1), [
+		rotateAxis(theta),
+		translate(0, 8, 0),
+		rotateAxis([180, 0, 0]),
+		scalem(4, 4, 2),
+	]);
+	addObj("pyramid", vec4(0, 0, 1, 1), [
+		rotateAxis(theta),
+		translate(0, 7, .5),
+		rotateAxis([90 + 14.036, 0, 0]),
+		scalem(2, 2, 1),
+	]);
+	addObj("teapot", vec4(0, 0, 1, 1), [
+		rotateAxis(theta),
+		translate(-5, 0, 6),
+		scalem(.3, .3, .3),
+		rotate(intrinsicRotation, [0, 1, 0]),
+	], {
+		ambientIntensity: .4,
+		shininess: sceneShininess,
+		specularColor: vec4(1, 1, 1, 1),
+		textureBlend: 0,
+	}, {
+		thresholdLight: cartoonLightThreshold,
+		thresholdDark: cartoonDarkThreshold,
+	}
+	);
+	return;
+}
+
+//
+// Generische Funktion um ein Objekt in die Szene einzufügen
+// type gibt die Form des Obkekts an (Grundprimitiv)
+// color beschreibt die DiffuseColor des Objekts
+// matInstructionset ist ein Array, welches in Reihenfolge mit dem model des Objekts ausmultipliziert wird
+//
+function addObj(type, color, matInstructionset, material = {
+	ambientIntensity: .4,
+	shininess: sceneShininess,
+	specularColor: vec4(1, 1, 1, 1),
+	textureBlend: 0,
+}, cartoon = {}) {
+	
+	numVertices = 0;
+	pointsArray.length = 0;
+	colorsArray.length = 0;
+	normalsArray.length = 0;
+
+	// jetzt werden die Arrays mit der entsprechenden Zeichenfunktion mit Daten gefüllt
+	switch (type) {
+		case "cube": drawCube();
+			break;
+		case "pyramid": drawPyramid();
+			break;
+		case "teapot": drawTeapot();
+			break;
+	}
+
+	// die Information über die Beleuchtungsrechnung wird an die Shader weitergegeben
+	gl.uniform1i(gl.getUniformLocation(program, "lighting"), material != false);
+
+	if (material) {
+		// deckkraft der HSRM-Textur festlegen
+		gl.uniform1f(gl.getUniformLocation(program, "textureBlend"), material.textureBlend);
+
+		// es soll also eine Beleuchtungsrechnung durchgeführt werden
+
+		// die Materialfarbe für diffuse Reflektion wird spezifiziertor;
+		material.diffuseColor = color;
+		// die Beleuchtung wird durchgeführt und das Ergebnis an den Shader übergeben
+		calculateLights(material);
+		if(cartoonOn && cartoon.thresholdLight != undefined && cartoon.thresholdDark != undefined) {
+			cartoon.thresholdLight = cartoon.thresholdLight;
+			cartoon.thresholdDark = cartoon.thresholdDark;
+		} else {
+			cartoon.thresholdLight = -1.0;
+			cartoon.thresholdDark = -1.0;	
+		}
+	} else {
+		// no cartoon shading if no phong
+		cartoon.thresholdLight = -1.0;
+		cartoon.thresholdDark = -1.0;
+	}
+	gl.uniform1f(gl.getUniformLocation(program, "cartoonLightThreshold"), cartoon.thresholdLight);
+	gl.uniform1f(gl.getUniformLocation(program, "cartoonDarkThreshold"), cartoon.thresholdDark);
+	// es muss noch festgelegt werden, wo das Objekt sich in Weltkoordinaten befindet,
+	// d.h. die Model-Matrix muss errechnet werden. Dazu werden wieder Hilfsfunktionen
+	// für die Matrizenrechnung aus dem externen Javascript MV.js verwendet
+
+	// Initialisierung mit der Einheitsmatrix 
+	model = mat4();
+
+	matInstructionset.forEach(mi => {
+		model = mult(model, mi);
+	});
+
+	// die Model-Matrix ist fertig berechnet und wird an die Shader übergeben 
+	gl.uniformMatrix4fv(gl.getUniformLocation(program, "modelMatrix"), false, flatten(model));
+
+	// jetzt wird noch die Matrix errechnet, welche die Normalen transformiert
+	normalMat = mat4();
+	normalMat = mult(view, model);
+	normalMat = inverse(normalMat);
+	normalMat = transpose(normalMat);
+
+	// die Normal-Matrix ist fertig berechnet und wird an die Shader übergeben 
+	gl.uniformMatrix4fv(gl.getUniformLocation(program, "normalMatrix"), false, flatten(normalMat));
+
+	if (type == "teapot") {
+		// Teekanne zeichnen - hier wird drawElements statt wie bislang drawArrays verwendet
+		gl.drawElements(gl.TRIANGLES, teapotVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+		return;
+	}
+
+	// schließlich wird alles gezeichnet. Dabei wird der Vertex-Shader numVertices mal aufgerufen
+	// und dabei die jeweiligen attribute - Variablen für jeden einzelnen Vertex gesetzt
+	// außerdem wird OpenGL mitgeteilt, dass immer drei Vertices zu einem Dreieck im Rasterisierungsschritt
+	// zusammengesetzt werden sollen
+	gl.drawArrays(gl.TRIANGLES, 0, numVertices);
+}
+
+
+//
+// hier wird eine namenslose Funktion definiert, die durch die Variable render zugegriffen werden kann.
+// diese Funktion wird für jeden Frame aufgerufen
+//
+var render = () => {
+
+	// den Framebuffer (hier wird das Bild hineingeschrieben) und den z-Buffer (wird für Verdeckungsrechnung benötigt)
+	// initialisieren.
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+
+	// Durchführung der Animation: der Würfel wird um 2° weiter gedreht und zwar um die aktuell ausgewählte Achse
+	if (rotationOn)
+		theta[axis] += 2*60/144;//2.0;
+
+	intrinsicRotation += 360 / ((fps == 0 ? 1 : fps) * 10); // 360° in 10s mit div-0 avoidance 
+
+	// jetzt kann die Szene gezeichnet werden
+	displayScene();
+
+	// FPS ermitteln
+	getFPS();
+
+	// der Frame fertig gezeichnet ist, wird veranlasst, dass der nächste Frame gezeichnet wird. Dazu wird wieder
+	// die die Funktion aufgerufen, welche durch die Variable render spezifiziert wird
+	requestAnimFrame(render);
+}
+
+function getFPS() {
+	if (counter > 20) {
+		counter = 0;
+		fps = Math.floor(20 / (Date.now() - then) * 1000)
+		$("#fps").html("FPS: " + fps);
+		then = Date.now();
+	}
+	counter++;
+}
+
+
+
+/*** Funktionen zur Ausführung von WebGL  */
+
+
+//
+// Diese Funktion wird beim Laden der HTML-Seite ausgeführt. Sie ist so etwas wie die "main"-Funktion
+// Ziel ist es, WebGL zu initialisieren
+//
+
+window.onload = function init() {
+
+	// die Referenz auf die Canvas, d.h. den Teil des Browserfensters, in den WebGL zeichnet, 
+	// wird ermittelt (über den Bezeichner in der HTML-Seite)
+	canvas = $("#gl-canvas")[0];
+
+	// über die Canvas kann man sich den WebGL-Kontext ermitteln, über den dann die OpenGL-Befehle
+	// ausgeführt werden
+	gl = WebGLUtils.setupWebGL(canvas);
+	if (!gl) { alert("WebGL isn't available"); }
+
+	// allgemeine Einstellungen für den Viewport (wo genau das Bild in der Canvas zu sehen ist und
+	// wie groß das Bild ist)
+	gl.viewport(0, 0, canvas.width, canvas.height);
+
+	// die Hintergrundfarbe wird festgelegt
+	gl.clearColor(0.9, 0.9, 1.0, 1.0);
+
+	// die Verdeckungsrechnung wird eingeschaltet: Objekte, die näher an der Kamera sind verdecken
+	// Objekte, die weiter von der Kamera entfernt sind
+	gl.enable(gl.DEPTH_TEST);
+
+	// der Vertex-Shader und der Fragment-Shader werden initialisiert
+	program = initShaders(gl, "vertex-shader", "fragment-shader");
+
+	// die über die Refenz "program" zugänglichen Shader werden aktiviert
+	gl.useProgram(program);
+
+	// OpenGL Speicherobjekte anlegen
+	vBuffer = gl.createBuffer();
+	nBuffer = gl.createBuffer();
+	cBuffer = gl.createBuffer();
+	tcBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, tcBuffer);
+	// Set Texcoords.
+	setTexcoords(gl);
+	// Textur laden
+	var img = document.getElementById("texImage");
+	var t = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, t);
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+	gl.generateMipmap(gl.TEXTURE_2D);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.uniform1i(gl.getUniformLocation(program, "src"), 0);
+
+	var texCoordLoc = gl.getAttribLocation(program, "a_texcoord");
+	// Turn on the texcoord attribute
+	gl.enableVertexAttribArray(texCoordLoc);
+	// bind the texcoord buffer.
+	gl.bindBuffer(gl.ARRAY_BUFFER, tcBuffer);
+	gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
+
+	// Teapot JSON laden
+	loadTeapot();
+
+	// die Callbacks für das Anklicken der Buttons wird festgelegt
+	// je nachdem, ob man den x-Achsen, y-Achsen oder z-Achsen-Button klickt, hat
+	// axis einen anderen Wert
+	$(".cameraControls").click((e) => {
+		camIndex = e.target.value;
+	});
+	$("#ButtonX").click(() => { axis = 0; });
+	$("#ButtonY").click(() => { axis = 1; });
+	$("#ButtonZ").click(() => { axis = 2; });
+	$("#ButtonT").click(() => { rotationOn = !rotationOn });
+	$("#ButtonC").click(() => { cartoonOn = !cartoonOn });
+	$("#thresholdLight").on('input', (e) => { cartoonLightThreshold = e.target.value;});
+	$("#thresholdDark") .on('input', (e) => { cartoonDarkThreshold  = e.target.value;});
+	$("#ambient")  .on('input', (e) => { ambientLight = e.target.value;});
+	$("#shininess").on('input', (e) => { sceneShininess = e.target.value;});
+	// update Controls
+	$(".controls").click(() => {
+		updateControls();
+	});
+
+	// jetzt kann mit dem Rendern der Szene begonnen werden  
+	render();
+}
+
+function updateControls() {
+	$(".controls *").removeClass("active");
+	if(rotationOn) $("#ButtonT").addClass("active");
+	if(axis == 0) $("#ButtonX").addClass("active");
+	else if(axis == 1) $("#ButtonY").addClass("active");
+	else if(axis == 2) $("#ButtonZ").addClass("active");
+	$(".cameraControls").eq(camIndex).addClass("active");
+	if(camIndex == 4) $(".cameraControls").eq(camPosIndex).addClass("active");
+	if(cartoonOn) $("#ButtonC").addClass("active");
+}
+
+function setTexcoords(gl) {
+	gl.bufferData(
+		gl.ARRAY_BUFFER,
+		new Float32Array([
+			0, 0,
+			0, 2,
+			2, 2,
+			0, 0,
+			2, 2,
+			2, 0,
+
+			0, 0,
+			0, 2,
+			2, 2,
+			0, 0,
+			2, 2,
+			2, 0,
+
+			0, 0,
+			0, 2,
+			2, 2,
+			0, 0,
+			2, 2,
+			2, 0,
+
+			0, 0,
+			0, 2,
+			2, 2,
+			0, 0,
+			2, 2,
+			2, 0,
+
+			0, 0,
+			0, 2,
+			2, 2,
+			0, 0,
+			2, 2,
+			2, 0,
+
+			0, 0,
+			0, 2,
+			2, 2,
+			0, 0,
+			2, 2,
+			2, 0,
+
+
+		]),
+		gl.STATIC_DRAW
+	);
+}
+

@@ -1,0 +1,53 @@
+Bewertungsbogen Blatt 5
+
+Name: FIXME                            Ihre Punkte -------------.
+                                       moegliche Punkte ----.    \
+                                                             \    \
+                                                              v    v
+5.1 (a) create.c
+        SHM erzeugen                                          1 /  1
+        SHM Groesse setzen                                    1 /  1
+5.2 (a) Semaphor Initialisierung                              1 /  1
+
+5.1 (b) destroy.c
+        SHM loeschen                                          1 /  1
+
+5.1 (c) schreiber.c
+        Funktionalitaet Schreiber                             2 /  2
+        SHM einblenden                                        1 /  1
+5.2 (b) Semaphor Synchronisation                              1 /  1
+
+5.1 (d) leser.c
+        Funktionalitaet Leser                                 2 /  2
+
+5.2     philosophen.c
+        Bereitstellung der IPC-Objekte                        2 /  2
+        Philosophen als Kindprozesse                          1 /  1
+        Kommunikation und Synchronisation ueber SHM           1 /  1
+        Geforderte Ausgaben                                   1 /  1
+        Synchronisierung                                      2 /  2
+        Korrekte Funktionalitaet                              2 /  2
+        Initialer Prozess wartet auf Kindprozesse             1 /  1
+        Aufraeumen / Freigabe der IPC-Objekte                 1 /  1
+
+Abzuege bei fehlender Return-Code-Behandlung                 -3 /  0
+Abzuege bei Compiler-Warnungen                               -3 /  0
+Abzuege Lesbarkeit                                           -3 /  0
+
+Gesamtpunkte:                                 maximal 20 von 21 / FIXME
+
+Compiler-Warnungen:
+
+Fehlerbehandlung:
+
+Create:
+
+Destroy:
+
+Schreiber:
+
+Leser:
+
+Philosophen:
+
+Coding-Style:
