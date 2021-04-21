@@ -1,0 +1,11 @@
+Inhaltsverzeichnis
+
+*** Jeder Eintrag bildet ein Link zur Stelle, die er beschreibt
+*** Als (zweistufige) nummerierte Liste zu realisieren.
+
+Einleitung
+Kapitel 1
+Kapitel 2
+  Abschnitt 1
+  Abschnitt 2
+Anhang (Tabelle)
