@@ -38,7 +38,8 @@ int32_t hmstr_readentry(
 	int fd;
 	int ret;
 	Hamsterdesc h;
-
+	//DEBUG OUTPUT:
+	printf("looking for entry ID %i", ID);
 	fd = open(DATAFILE, O_RDONLY);
 	if(fd < 0)
 	{
