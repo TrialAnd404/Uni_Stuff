@@ -1,0 +1,72 @@
+Test summery: 
+	 run 65 test cases
+	 test failed 0
+	 execution time 36s
+Failure list: 
+Bewertung: Blatt 03
+==============================================
+
+Datum:                        2021-05-24
+Prüfer:                       Beckmann
+
+Name:                         Rumrich
+Maximalpunktzahl:             20
+Gesamtpunktzahl:              17
+
+
+Test Zusammenfassung: 
+==============================================
+
+Ausgeführte Testfälle:        65
+Fehlgeschlagene Testfälle:    0
+Ausführungszeit:              36s
+
+
+Verlorene Punkte
+==============================================
+
+
+Bewertung: 
+
+______________________________________________
+Gesamtabzüge für Tests:       0
+
+Abzug für Warnings:           0
+
+Code Qualität:                3
+
+Dokumentation:                0
+
+Kommentare:
+Code Qualität und Dokumentation:
+
+- read ohne rückgabewert überprüfung?
+- send ohne rückgabewert überprüfung?
+- read und send, warum nicht einheitlich, recv und send bzw. read und write?
+- hardcoded buffer größen, sollte vermieden werden
+- immer eine gute idee ein kommentar über eine funktion zu schreiben in der sie kurz beschrieben ist. insb. wenn sie in einer header datei deklariert ist.
+- hardcoded buffer size ist nicht gut, besser Macros oder direkt die defines der Hamsterlib nehmen
+
+
+
+
+Maximum line length: 106 -> should be  <= 100 
+Number of empty lines: 35 -> should be less than 15 % of total number of lines (31.950000) 
+Number of lines: 213 -> average lines per function should be less than 25 
+Number of Doxygen comments: 2 -> Bonus for using doxygen comments 
+Style inconsistency: 0.096552 
+Number of mean cyclomatic complexity per function: 12 -> should be  <= 10 
+Number of maximum cyclomatic complexity per function: 23 -> should be  <= 20 
+Minimum of spaces used for one level of indentation: 2 -> should be  > 3 
+
+
+Summary:
+Code quality: 37.84 %
+Documentation quality:  100.00 %
+Warnings: ---
+
+
+
+Fehlgeschlagene Testfälle, detailliert: 
+==============================================
+

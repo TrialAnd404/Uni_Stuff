@@ -1,5 +1,8 @@
 *.mp4
-VS/Übungen/svn/vs21_trumr001/1/doc/*
+VS/Übungen/svn/vs21_trumr001/*/doc/*
 *.svn/pristine*
 *.svn-base
 *.html
+wbaRails/*
+*.zip
+KI/Übungen/Teil2/*.csv

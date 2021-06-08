@@ -1,30 +1,57 @@
-Bewertung: Blatt {exercise}
+Bewertung: Blatt 1
 ==============================================
 
-Datum: 			{date}
-Prüfer:			{examiner}
+Datum: 			21-05-16
+Prüfer:			Beckmann
 
-Name:			{name}
+Name:			Rumrich
 Maximalpunktzahl: 	20
-Gesamtpunktzahl:  	{points}
+Gesamtpunktzahl:  	14
 
 
 Verlorene Punkte
 ==============================================
 
-Funktionale Fehler:	{func_error}
+Funktionale Fehler:	4
 Fehlgeschlagene Tests:
-{failed_tests}
+Fehler in Test 2.13 -s zuviele args -> kein Fehler
+Fehler in Test 2.14 -s zu wenige args -> kein Fehler
+Fehler in Test 2.15 -s keine args -> kein Fehler
+Fehler in Test 2.16 -b zuviele args -> kein Fehler
+Fehler in Test 3.8 -b unbek Kunde -> kein Fehler
+Fehler in Test 4.1 -l Langer Name -> kein Fehler
+Fehler in Test 4.9 -b Langer Name -> kein Fehler
 
-Abzug für Warnings:	{warning_error}
-Kommentar:
-{warning_comment}
+- folgefehler. max 2 pro Kat -> 4
 
-Code Qualität:		{quality_error}
+Abzug für Warnings:	0
 Kommentar:
-{quality_comment}
+---
 
-Dokumentation:		{docu_error}
+Code Qualität:		2
 Kommentar:
-{docu_comment}
+-- siehe unten --
+
+Dokumentation:		0
+Kommentar:
+
+- bei -s wird bei falscher argumentenanzahl nicht abgebrochen
+- etwas viele einrückungsebenen. weniger wären besser zu lesen
+- hardcoded char-array größen sind nicht gut. bessr das macro aus der hamsterlib nehmen oder ein eigenes definieren
+- hardcoded char-array größen sind 1 byte zu klein.
+- warum mehrmals auf anz. argumente testen und dann jeweils ein bissel was machen? 
+- hmstr_collect rückgabewert nicht überprüft
+
+Maximum line length: 122 -> should be  <= 100 
+Number of lines: 247 -> average lines per function should be less than 25 
+Number of comment characters: 687 -> Comments should be at least 10 % of total text (7883) 
+Number of Doxygen comments: 4 -> Bonus for using doxygen comments 
+Style inconsistency: 0.114025 
+Number of mean cyclomatic complexity per function: 12.250000 -> should be  <= 10 
+Number of maximum cyclomatic complexity per function: 36 -> should be  <= 20 
+
+
+Summary:
+Code quality: 41.44 %
+Documentation quality:  100.00 %
 
