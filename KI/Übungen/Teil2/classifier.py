@@ -99,32 +99,31 @@ class NaiveBayesLyricsClassifier:
             for lyric_token in lyrics:
                 if re.search("^[a-z]*$", lyric_token):
                     # token verwendung über alle genres +1
-                    tokens_all_genres.get(lyric_token, 0) + 1
+                    tokens_all_genres[lyric_token] = tokens_all_genres.get(lyric_token, 0) +1
                     # token verwendung in diesem genre +1
                     tokens_specific_genre[genre][lyric_token] = tokens_specific_genre[genre].get(lyric_token, 0) + 1
 
         # labels = dictionary mit bekannten genres + worten mit nutzungshaeufigkeit
         # features = alle benutzten token mit nutzungshaeufigkeit
-        print(tokens_all_genres)
         for genre in model["genres"].keys():
             model["priors"][genre] = model["genres"][genre] / songcount
 
         print(model)
         #print(tokens_specific_genre)
 
-        print(tokens_all_genres)
+
         for genre in model["genres"].keys():
-            print(genre)
+
             for token in tokens_all_genres.keys():
-                print(token)
+
                 #print(labels.get(label).get(feature, 0) / features.get(feature))
                 p1 = tokens_specific_genre[genre].get(token, 0) / model["genres"][genre]
                 p0 = 1-p1
-                model["vocabulary"][token][genre] = [p0, p1]
+                model2[token][genre] = [p0, p1]
 
 
 
-        print(model)
+        print(model2)
 
         """
           model = defaultdict(dict)
@@ -160,7 +159,7 @@ class NaiveBayesLyricsClassifier:
             print(genre, genrecounter[genre], tokens_specific_genre[genre].get(testword, 0))
 
         for genre in model["genres"].keys():
-            print(genre, model["vocabulary"][testword].get(genre))
+            print(genre, model2[testword].get(genre))
 
         # store model
         with open('model.pkl', 'wb') as file:
