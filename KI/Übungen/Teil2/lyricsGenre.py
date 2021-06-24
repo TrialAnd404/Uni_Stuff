@@ -35,7 +35,7 @@ for genre in genres_unique:
     genre_words[genre] = 0
     #print(genre, ":")
     for i, word in enumerate(word_dict_sorted[genre]):
-        #print(i, ": ", word)
+        print(i, ": ", word)
         if i >= 10: break # Nur Top 10
 
 vokabular_token_total = defaultdict(dict)
