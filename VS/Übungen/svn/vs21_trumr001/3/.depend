@@ -1,0 +1,13 @@
+replyWriter.o: src/replyWriter.c include/replyWriter.h include/structs.h \
+ include/hamsterrpc.h include/hamsterlib.h include/structs.h \
+ include/hamsterrpc.h include/hamsterlib.h
+payloadHandler.o: src/payloadHandler.c include/payloadHandler.h \
+ include/structs.h include/hamsterlib.h include/replyWriter.h \
+ include/hamsterrpc.h
+headerHandler.o: src/headerHandler.c include/headerHandler.h \
+ include/structs.h
+hamster_server.o: src/hamster_server.c include/hamsterlib.h \
+ include/hamsterrpc.h include/structs.h include/payloadHandler.h \
+ include/structs.h include/hamsterlib.h include/replyWriter.h \
+ include/hamsterrpc.h include/replyWriter.h include/headerHandler.h
+hamsterrpc.o: src/hamsterrpc.c src/../include/hamsterrpc.h

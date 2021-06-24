@@ -1,0 +1,39 @@
+Bewertung: Blatt 03
+==============================================
+
+Datum:                        2021-05-16
+Prüfer:                       Bernd
+
+Name:                         vs21
+Maximalpunktzahl:             20
+Gesamtpunktzahl:              {points}
+
+
+Test Zusammenfassung: 
+==============================================
+
+Ausgeführte Testfälle:        65
+Fehlgeschlagene Testfälle:    0
+Ausführungszeit:              37s
+
+
+Verlorene Punkte
+==============================================
+
+
+______________________________________________
+Gesamtabzüge für Tests:       0
+
+Abzug für Warnings:           {warning_error}
+
+Code Qualität:                {quality_error}
+
+Dokumentation:                {docu_error}
+
+Kommentare:
+
+
+
+Fehlgeschlagene Testfälle, detailliert: 
+==============================================
+

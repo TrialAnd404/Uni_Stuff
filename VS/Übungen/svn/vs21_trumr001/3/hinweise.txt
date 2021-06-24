@@ -1,0 +1,7 @@
+- read ohne rückgabewert überprüfung?
+- send ohne rückgabewert überprüfung?
+- read und send, warum nicht einheitlich, recv und send bzw. read und write?
+- hardcoded buffer größen, sollte vermieden werden
+- immer eine gute idee ein kommentar über eine funktion zu schreiben in der sie kurz beschrieben ist. insb. wenn sie in einer header datei deklariert ist.
+- hardcoded buffer size ist nicht gut, besser Macros oder direkt die defines der Hamsterlib nehmen
+

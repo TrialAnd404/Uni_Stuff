@@ -1,0 +1,10 @@
+*.mp4
+VS/Übungen/svn/*
+*.svn/pristine*
+*.svn-base
+*.html
+wbaRails/*
+*.zip
+*.dat
+KI/Übungen/Teil2/*.csv
+
