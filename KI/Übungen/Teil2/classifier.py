@@ -206,26 +206,27 @@ class NaiveBayesLyricsClassifier:
         """
         epsilon = 0.000001
 
-        songpredictions = defaultdict(dict)
+        predictions = defaultdict(dict)
         for feature in features:
             currentSong = feature[2]
 
             for genre in self.model["genres"].keys():
-                songpredictions[feature[0]][genre] = math.log10(self.model["priors"][genre])
+                predictions[feature[0]][genre] = math.log10(self.model["priors"][genre])
                 #default: priors addieren
 
-            for token in self.model.keys():
+            for token in self.model["vocabulary"].keys():
                 if token in currentSong:
-                    for genre in self.genres:
-                        songpredictions[i][genre] += math.log10(max(self.model["vocabulary"][token][genre][1], epsilon))
+                    for genre in self.model["genres"].keys():
+                        predictions[feature[0]][genre] += math.log10(max(self.model["vocabulary"][token][genre][1], epsilon))
                 else:
-                    for genre in self.genres:
-                        songpredictions[i][genre] += math.log10(max(self.model["vocabulary"][token][genre][0], epsilon))
+                    for genre in self.model["genres"].keys():
+                        predictions[feature[0]][genre] += math.log10(max(self.model["vocabulary"][token][genre][0], epsilon))
 
-        print(songpredictions)
-
-
-
+        print(predictions)
+        i = 0
+        for song in predictions.keys():
+            print(song, "actual genre: ", features[i][1], "calculated genre: ", max(predictions[song].items(), key=lambda x: x[1]))
+            i += 1
 
 if __name__ == "__main__":
 
@@ -284,7 +285,7 @@ if __name__ == "__main__":
         # FIXME: implement later
         features = []
 
-        with open('testfile.csv', encoding="utf-8") as csvdatei:
+        with open('test.csv', encoding="utf-8") as csvdatei:
             songreader = csv.reader(csvdatei, delimiter=',')
             next(songreader)
 
@@ -293,8 +294,8 @@ if __name__ == "__main__":
                 if rowcount > 5: break
                 # print(row[2], row[4])
                 # nur adden, wenn beide einen akzeptierten value haben
-                genre = row[2]
-                title = row[1]
+                genre = row[3]
+                title = row[0]
                 lyric = row[4]
                 tokenized_lyrics = set(nltk.word_tokenize(lyric.lower()))
                 features.append((title, genre, tokenized_lyrics))
