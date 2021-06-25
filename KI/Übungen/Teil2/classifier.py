@@ -122,44 +122,28 @@ class NaiveBayesLyricsClassifier:
                 model2[token][genre] = [p0, p1]
 
 
-
-        print(model2)
-
-        """
-          model = defaultdict(dict)
-                for genre in genrecounter.keys():
-                    for token in tokens_specific_genre[genre].keys():
-                        # print(labels.get(label).get(feature, 0) / features.get(feature))
-                        p1 = tokens_specific_genre[genre].get(token, 0) / genrecounter[genre]
-                        p0 = 1 - p1
-                        model[token][genre] = [p0, p1]
-        
-                for token in model.keys():
-                    for genre in model[token].keys():
-                        if not (model[token][genre][0] == 1.0 or model[token][genre][0] == 0.0):
-                            print(token, genre, model[token][genre])
-        
-        """
-
-
+        model["vocabulary"]=model2
         #print(model2)
+
         """
-                for token in model["vocabulary"].keys():
-                    for genre in model["genres"].keys():
-                        if not(model["vocabulary"].get(token).get(genre)[0] == 1.0 or model["vocabulary"].get(token).get(genre)[0] == 0.0):
-                            print(token, genre, model["vocabulary"][token][genre])
-        """
+        #print(model2)
+
+        for token in model["vocabulary"].keys():
+            for genre in model["genres"].keys():
+                if not(model["vocabulary"].get(token).get(genre)[0] == 1.0 or model["vocabulary"].get(token).get(genre)[0] == 0.0):
+                    print(token, genre, model["vocabulary"][token][genre])
+
 
         #mini test mit shake
 
         #print(self.model)
-
-        testword = "suicides"
+        """
+        testword = "shake"
         for genre in tokens_specific_genre.keys():
             print(genre, genrecounter[genre], tokens_specific_genre[genre].get(testword, 0))
 
         for genre in model["genres"].keys():
-            print(genre, model2[testword].get(genre))
+            print(genre, model["vocabulary"][testword].get(genre))
 
         # store model
         with open('model.pkl', 'wb') as file:
@@ -268,7 +252,7 @@ if __name__ == "__main__":
         lyrics = []
 
         #with open('train_big/train.csv', encoding="utf-8") as csvdatei:
-        with open('train_small.csv', encoding="utf-8") as csvdatei:
+        with open('train_big/train.csv', encoding="utf-8") as csvdatei:
             songreader = csv.reader(csvdatei, delimiter=',')
             next(songreader)
             i = 0
@@ -300,13 +284,13 @@ if __name__ == "__main__":
         # FIXME: implement later
         features = []
 
-        with open('train_small.csv', encoding="utf-8") as csvdatei:
+        with open('testfile.csv', encoding="utf-8") as csvdatei:
             songreader = csv.reader(csvdatei, delimiter=',')
             next(songreader)
 
-            i = 0
+            rowcount = 0
             for row in songreader:
-                if i > 5: break
+                if rowcount > 5: break
                 # print(row[2], row[4])
                 # nur adden, wenn beide einen akzeptierten value haben
                 genre = row[2]
@@ -314,6 +298,7 @@ if __name__ == "__main__":
                 lyric = row[4]
                 tokenized_lyrics = set(nltk.word_tokenize(lyric.lower()))
                 features.append((title, genre, tokenized_lyrics))
+                rowcount += 1
 
         """
             HIER MUSS WAS PASSIEREN
