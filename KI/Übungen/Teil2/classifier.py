@@ -123,7 +123,7 @@ class NaiveBayesLyricsClassifier:
 
 
         model["vocabulary"]=model2
-        #print(model2)
+        print(model2)
 
         """
         #print(model2)
@@ -176,16 +176,12 @@ class NaiveBayesLyricsClassifier:
                  'Hip-hop',  # Label 2
                  ...
               ]
-        """
-        """
+
                 # FIXME: implement
         
                 raise NotImplementedError()
         
-                
-        """
 
-        """
             features: (= songlyrics von verschiedenen songs)
                 -> tokenizen, lowercasen, setten ---> jedes token kommt nur einmal vor        
             
@@ -228,6 +224,7 @@ class NaiveBayesLyricsClassifier:
             print(song, "actual genre: ", features[i][1], "calculated genre: ", max(predictions[song].items(), key=lambda x: x[1]))
             i += 1
 
+
 if __name__ == "__main__":
 
     # parse command line arguments (no need to touch)
@@ -253,7 +250,7 @@ if __name__ == "__main__":
         lyrics = []
 
         #with open('train_big/train.csv', encoding="utf-8") as csvdatei:
-        with open('train_big/train.csv', encoding="utf-8") as csvdatei:
+        with open('train_small.csv', encoding="utf-8") as csvdatei:
             songreader = csv.reader(csvdatei, delimiter=',')
             next(songreader)
             i = 0
@@ -267,18 +264,19 @@ if __name__ == "__main__":
                 tokenized_lyrics = set(nltk.word_tokenize(lyric.lower()))
                 lyrics.append(tokenized_lyrics)
 
+        len(lyric)
 
 
-            """
-            for genre in tokens_specific_genre.keys():
-                for token in tokens_specific_genre[genre].keys():
-                    print(genre, token, tokens_specific_genre[genre][token])
+        """
+        for genre in tokens_specific_genre.keys():
+            for token in tokens_specific_genre[genre].keys():
+                print(genre, token, tokens_specific_genre[genre][token])
 
-            for token in tokens_all_genres.keys():
-                if tokens_all_genres[token] > 5:
-                    print(token, tokens_all_genres[token])
-            
-            """
+        for token in tokens_all_genres.keys():
+            if tokens_all_genres[token] > 5:
+                print(token, tokens_all_genres[token])
+        
+        """
         classifier.train(lyrics, genres)
 
     if args.apply:
@@ -305,6 +303,6 @@ if __name__ == "__main__":
             HIER MUSS WAS PASSIEREN
         """
 
-        classifier.apply(features);
-        #print("Todo")
+        classifier.apply(features)
+        # print("Todo")
 
