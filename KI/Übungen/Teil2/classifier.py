@@ -200,7 +200,7 @@ class NaiveBayesLyricsClassifier:
                 Country: log(0.2) + log(0.1) + ...
                 ...
         """
-        epsilon = 0.000001
+        epsilon = 0.0001
 
         predictions = defaultdict(dict)
         for feature in features:
@@ -218,11 +218,19 @@ class NaiveBayesLyricsClassifier:
                     for genre in self.model["genres"].keys():
                         predictions[feature[0]][genre] += math.log10(max(self.model["vocabulary"][token][genre][0], epsilon))
 
-        print(predictions)
+        # print(predictions)
         i = 0
+        j = 0
         for song in predictions.keys():
-            print(song, "actual genre: ", features[i][1], "calculated genre: ", max(predictions[song].items(), key=lambda x: x[1]))
-            i += 1
+        #     print(song, "actual genre: ", features[i][1], "calculated genre: ", max(predictions[song].items(), key=lambda x: x[1]))
+            max(predictions[song].items(), key=lambda x: x[1])
+
+
+        #     if features[i][1] == (max(predictions[song].items(), key=lambda x: x[1]))[0]:
+        #         j += 1
+        #     i += 1
+        # print("Richtig Klassifiziert in %:", j/i*100)
+        return (max(predictions[song].items(), key=lambda x: x[1]))[0]
 
 
 if __name__ == "__main__":
@@ -288,21 +296,19 @@ if __name__ == "__main__":
             next(songreader)
 
             rowcount = 0
+            correct_count = 0
             for row in songreader:
-                if rowcount > 5: break
                 # print(row[2], row[4])
                 # nur adden, wenn beide einen akzeptierten value haben
                 genre = row[3]
                 title = row[0]
                 lyric = row[4]
                 tokenized_lyrics = set(nltk.word_tokenize(lyric.lower()))
-                features.append((title, genre, tokenized_lyrics))
+                # features.append((title, genre, tokenized_lyrics))
                 rowcount += 1
 
-        """
-            HIER MUSS WAS PASSIEREN
-        """
-
-        classifier.apply(features)
-        # print("Todo")
+                res = classifier.apply([(title, genre, tokenized_lyrics)])
+                if genre == res:
+                    correct_count += 1
+                print("Genre | Programm:", genre, "|", res, "=>", (correct_count/rowcount) * 100, "%")
 
