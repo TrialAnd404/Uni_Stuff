@@ -220,9 +220,13 @@ class NaiveBayesLyricsClassifier:
 
         print(predictions)
         i = 0
+        j = 0
         for song in predictions.keys():
             print(song, "actual genre: ", features[i][1], "calculated genre: ", max(predictions[song].items(), key=lambda x: x[1]))
+            if features[i][1] == max(predictions[song].items(), key=lambda x: x[1])[0]:
+                j += 1
             i += 1
+        print("Richtig Klassifiziert: ", j)
 
 
 if __name__ == "__main__":
@@ -283,13 +287,16 @@ if __name__ == "__main__":
         # FIXME: implement later
         features = []
 
+        print(len(classifier.model["vocabulary"]))
         with open('test.csv', encoding="utf-8") as csvdatei:
             songreader = csv.reader(csvdatei, delimiter=',')
             next(songreader)
 
             rowcount = 0
+            correctCount = 0
             for row in songreader:
-                if rowcount > 5: break
+
+                #if rowcount > 100: break
                 # print(row[2], row[4])
                 # nur adden, wenn beide einen akzeptierten value haben
                 genre = row[3]
@@ -299,10 +306,6 @@ if __name__ == "__main__":
                 features.append((title, genre, tokenized_lyrics))
                 rowcount += 1
 
-        """
-            HIER MUSS WAS PASSIEREN
-        """
-
-        classifier.apply(features)
+                classifier.apply(features)
         # print("Todo")
 
