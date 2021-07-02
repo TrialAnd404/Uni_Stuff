@@ -1,0 +1,34 @@
+= form_for @books_instance do |f|
+  - if @books_instance.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@books_instance.errors.count, "error")} prohibited this books_instance from being saved:"
+      %ul
+        - @books_instance.errors.full_messages.each do |message|
+          %li= message
+
+  .field
+    = f.label :book
+    = f.text_field :book
+  .field
+    = f.label :shelfmark
+    = f.text_field :shelfmark
+  .field
+    = f.label :purchased_at
+    = f.date_select :purchased_at
+  .field
+    = f.label :user
+    = f.text_field :user
+  .field
+    = f.label :user
+    = f.text_field :user
+  .field
+    = f.label :checkout_at
+    = f.datetime_select :checkout_at
+  .field
+    = f.label :due_at
+    = f.date_select :due_at
+  .field
+    = f.label :returned_at
+    = f.datetime_select :returned_at
+  .actions
+    = f.submit 'Save'

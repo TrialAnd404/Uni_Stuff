@@ -1,0 +1,27 @@
+%p#notice= notice
+
+%p
+  %b Family name:
+  = @user.family_name
+%p
+  %b Given name:
+  = @user.given_name
+%p
+  %b Address:
+  = @user.address
+%p
+  %b Email:
+  = @user.email
+%p
+  %b Password:
+  = @user.password
+%p
+  %b Blocked:
+  = @user.blocked
+%p
+  %b Remarks:
+  = @user.remarks
+
+= link_to 'Edit', edit_user_path(@user)
+\|
+= link_to 'Back', users_path
