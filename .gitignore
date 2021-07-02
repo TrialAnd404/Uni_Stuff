@@ -2,9 +2,9 @@
 VS/Übungen/svn/*
 *.svn/pristine*
 *.svn-base
-wbaRails/*
-blogRevised/*
 *.zip
 *.dat
 KI/Übungen/Teil2/*.csv
 
+WBA/RailsProjekt/blogRevised/
+WBA/RailsProjekt/wbaRails/
