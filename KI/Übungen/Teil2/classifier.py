@@ -3,7 +3,9 @@
 
 # import everything from lyricsGenre.py
 import math
-import sys, os, argparse
+import sys
+import os
+import argparse
 from collections import Counter, defaultdict
 import pickle
 import nltk
@@ -13,17 +15,14 @@ import csv
 """
   Lyrics Classifier
   -------------------------
-  a small interface for document classification. Implement your own Naive Bayes classifier 
+  a small interface for document classification. Implement your own Naive Bayes classifier
   by completing the class NaiveBayesLyricsClassifier below.
 """
 
 
-
 class NaiveBayesLyricsClassifier:
 
-
     def __init__(self):
-
         """ The classifier should store all its learned information
             in this 'model' object. Pick whatever form seems appropriate
             to you. Recommendation: use 'pickle' to store/load this model! """
@@ -81,9 +80,10 @@ class NaiveBayesLyricsClassifier:
         genres = labels
         lyrics = features
 
-        genrecounter = defaultdict(dict) #wie oft song von bestimmtem genre
+        genrecounter = defaultdict(dict)  # wie oft song von bestimmtem genre
         tokens_all_genres = defaultdict(dict)  # token anzahl über alle genres
-        tokens_specific_genre = defaultdict(dict)  # token anzahl in speziellen genres
+        # token anzahl in speziellen genres
+        tokens_specific_genre = defaultdict(dict)
         #vocabulary = defaultdict(dict)
         #genres = defaultdict(dict)
 
@@ -95,13 +95,15 @@ class NaiveBayesLyricsClassifier:
         for genre, lyrics in zip(genres, lyrics):
             songcount += 1
             model["genres"][genre] = model["genres"].get(genre, 0) + 1
-            #print(lyrics)
+            # print(lyrics)
             for lyric_token in lyrics:
                 if re.search("^[a-z]*$", lyric_token):
                     # token verwendung über alle genres +1
-                    tokens_all_genres[lyric_token] = tokens_all_genres.get(lyric_token, 0) +1
+                    tokens_all_genres[lyric_token] = tokens_all_genres.get(
+                        lyric_token, 0) + 1
                     # token verwendung in diesem genre +1
-                    tokens_specific_genre[genre][lyric_token] = tokens_specific_genre[genre].get(lyric_token, 0) + 1
+                    tokens_specific_genre[genre][lyric_token] = tokens_specific_genre[genre].get(
+                        lyric_token, 0) + 1
 
         # labels = dictionary mit bekannten genres + worten mit nutzungshaeufigkeit
         # features = alle benutzten token mit nutzungshaeufigkeit
@@ -109,20 +111,19 @@ class NaiveBayesLyricsClassifier:
             model["priors"][genre] = model["genres"][genre] / songcount
 
         print(model)
-        #print(tokens_specific_genre)
-
+        # print(tokens_specific_genre)
 
         for genre in model["genres"].keys():
 
             for token in tokens_all_genres.keys():
 
                 #print(labels.get(label).get(feature, 0) / features.get(feature))
-                p1 = tokens_specific_genre[genre].get(token, 0) / model["genres"][genre]
+                p1 = tokens_specific_genre[genre].get(
+                    token, 0) / model["genres"][genre]
                 p0 = 1-p1
                 model2[token][genre] = [p0, p1]
 
-
-        model["vocabulary"]=model2
+        model["vocabulary"] = model2
         print(model2)
 
         """
@@ -140,7 +141,8 @@ class NaiveBayesLyricsClassifier:
         """
         testword = "shake"
         for genre in tokens_specific_genre.keys():
-            print(genre, genrecounter[genre], tokens_specific_genre[genre].get(testword, 0))
+            print(genre, genrecounter[genre],
+                  tokens_specific_genre[genre].get(testword, 0))
 
         for genre in model["genres"].keys():
             print(genre, model["vocabulary"][testword].get(genre))
@@ -159,9 +161,12 @@ class NaiveBayesLyricsClassifier:
                              'features' is of the form:
 
               [
-                [Songtitel, [ 'last', 'christmas', 'i', 'gave', 'you', ... ]],               # doc 0
-                [ 'just', 'a', 'smalltown', 'girl', ... ],                      # doc 1
-                [ 'my', 'baby', 'dont', 'mess', 'around', 'because', ... ],     # doc 2
+                [Songtitel, [ 'last', 'christmas', 'i', 'gave',
+                    'you', ... ]],               # doc 0
+                # doc 1
+                [ 'just', 'a', 'smalltown', 'girl', ... ],
+                [ 'my', 'baby', 'dont', 'mess', 'around',
+                    'because', ... ],     # doc 2
                 ...
               ]
 
@@ -178,51 +183,56 @@ class NaiveBayesLyricsClassifier:
               ]
 
                 # FIXME: implement
-        
+
                 raise NotImplementedError()
-        
+
 
             features: (= songlyrics von verschiedenen songs)
-                -> tokenizen, lowercasen, setten ---> jedes token kommt nur einmal vor        
-            
+                -> tokenizen, lowercasen, setten ---> jedes token kommt nur einmal vor
+
             model:
                 <token>:
                     Pop: [0,1]
                     ...
             ---> drüber iterieren, gucken ob in aktuellem song enthalten.
                 ---> wenn ja, dann in jedem Genre in SongN -->  Genre + <token>[Genre][1],
-                                                                sonst Genre + <token>[Genre][0]  
+                                                                sonst Genre + <token>[Genre][0]
             -----------
-            
+
             song1:
                 Pop: log(0.2) + log(0.7) + ....
                 Rock:   log(0.5) + log(0.6) + ...
                 Country: log(0.2) + log(0.1) + ...
                 ...
         """
-        epsilon = 0.000001
+        epsilon = 0.0001
 
         predictions = defaultdict(dict)
         for feature in features:
             currentSong = feature[2]
 
             for genre in self.model["genres"].keys():
-                predictions[feature[0]][genre] = math.log10(self.model["priors"][genre])
-                #default: priors addieren
+                predictions[feature[0]][genre] = math.log10(
+                    self.model["priors"][genre])
+                # default: priors addieren
 
             for token in self.model["vocabulary"].keys():
                 if token in currentSong:
                     for genre in self.model["genres"].keys():
-                        predictions[feature[0]][genre] += math.log10(max(self.model["vocabulary"][token][genre][1], epsilon))
+                        predictions[feature[0]][genre] += math.log10(
+                            max(self.model["vocabulary"][token][genre][1], epsilon))
                 else:
                     for genre in self.model["genres"].keys():
-                        predictions[feature[0]][genre] += math.log10(max(self.model["vocabulary"][token][genre][0], epsilon))
+                        predictions[feature[0]][genre] += math.log10(
+                            max(self.model["vocabulary"][token][genre][0], epsilon))
 
-        print(predictions)
+        # print(predictions)
         i = 0
         j = 0
         for song in predictions.keys():
-            print(song, "actual genre: ", features[i][1], "calculated genre: ", max(predictions[song].items(), key=lambda x: x[1]))
+
+            print(song, "actual genre: ", features[i][1], "calculated genre: ", max(
+                predictions[song].items(), key=lambda x: x[1]))
             if features[i][1] == max(predictions[song].items(), key=lambda x: x[1])[0]:
                 j += 1
             i += 1
@@ -233,9 +243,11 @@ if __name__ == "__main__":
 
     # parse command line arguments (no need to touch)
     parser = argparse.ArgumentParser(description='A document classifier.')
-    parser.add_argument('--train', help="train the classifier", action='store_true')
-    parser.add_argument('--train2', help="train the classifier (alternative)", action='store_true')
-    parser.add_argument('--apply', help="apply the classifier (you'll need to train or load"\
+    parser.add_argument(
+        '--train', help="train the classifier", action='store_true')
+    parser.add_argument(
+        '--train2', help="train the classifier (alternative)", action='store_true')
+    parser.add_argument('--apply', help="apply the classifier (you'll need to train or load"
                                         "a trained model first)", action='store_true')
     parser.add_argument('--inspect', help="get some info about the learned model",
                         action='store_true')
@@ -253,7 +265,7 @@ if __name__ == "__main__":
         genres = []
         lyrics = []
 
-        #with open('train_big/train.csv', encoding="utf-8") as csvdatei:
+        # with open('train_big/train.csv', encoding="utf-8") as csvdatei:
         with open('train_small.csv', encoding="utf-8") as csvdatei:
             songreader = csv.reader(csvdatei, delimiter=',')
             next(songreader)
@@ -270,7 +282,6 @@ if __name__ == "__main__":
 
         len(lyric)
 
-
         """
         for genre in tokens_specific_genre.keys():
             for token in tokens_specific_genre[genre].keys():
@@ -279,7 +290,7 @@ if __name__ == "__main__":
         for token in tokens_all_genres.keys():
             if tokens_all_genres[token] > 5:
                 print(token, tokens_all_genres[token])
-        
+
         """
         classifier.train(lyrics, genres)
 
@@ -293,19 +304,31 @@ if __name__ == "__main__":
             next(songreader)
 
             rowcount = 0
-            correctCount = 0
-            for row in songreader:
+<< << << < HEAD
+  correctCount = 0
+   for row in songreader:
 
-                #if rowcount > 100: break
-                # print(row[2], row[4])
-                # nur adden, wenn beide einen akzeptierten value haben
-                genre = row[3]
-                title = row[0]
-                lyric = row[4]
-                tokenized_lyrics = set(nltk.word_tokenize(lyric.lower()))
-                features.append((title, genre, tokenized_lyrics))
-                rowcount += 1
+              # if rowcount > 100: break
+== == == =
+  correct_count = 0
+   for row in songreader:
+>>>>>> > f34edb77821c65a6c9e013c49374d2a1a2823e39
+              # print(row[2], row[4])
+              # nur adden, wenn beide einen akzeptierten value haben
+  genre = row[3]
+   title = row[0]
+    lyric = row[4]
+    tokenized_lyrics = set(nltk.word_tokenize(lyric.lower()))
+    # features.append((title, genre, tokenized_lyrics))
+    rowcount += 1
 
-                classifier.apply(features)
-        # print("Todo")
-
+<< << << < HEAD
+  classifier.apply(features)
+      # print("Todo")
+== == == =
+  res = classifier.apply([(title, genre, tokenized_lyrics)])
+   if genre == res:
+        correct_count += 1
+    print("Genre | Programm:", genre, "|", res,
+          "=>", (correct_count/rowcount) * 100, "%")
+>>>>>> > f34edb77821c65a6c9e013c49374d2a1a2823e39
