@@ -58,6 +58,14 @@ class BooksInstancesController < ApplicationController
 
   @books_instances = BookInstance.custom_select(params[:filter])
 
+  def lending
+	all_params['User']{|a| @book_instance.lended_by_id = a.to_i}
+  end
+
+  def reserving
+	all_params['User']{|a| @book_instance.reserved_by_id = a.to_i}
+  end
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_books_instance

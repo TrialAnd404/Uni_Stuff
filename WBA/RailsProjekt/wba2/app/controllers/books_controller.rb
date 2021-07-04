@@ -22,6 +22,7 @@ class BooksController < ApplicationController
   # POST /books or /books.json
   def create
     @book = Book.new(book_params)
+	all_params['authors'].each{|a| @book.authos << Author.where(a.to_i)}
 
     respond_to do |format|
       if @book.save
