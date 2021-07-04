@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_02_111758) do
+ActiveRecord::Schema.define(version: 2021_07_02_115624) do
 
   create_table "authors", force: :cascade do |t|
     t.string "family_name"
@@ -37,4 +37,35 @@ ActiveRecord::Schema.define(version: 2021_07_02_111758) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "books_instances", force: :cascade do |t|
+    t.integer "book_id", null: false
+    t.string "shelfmark"
+    t.date "purchased_at"
+    t.integer "lended_by_id"
+    t.integer "reserved_by_id"
+    t.datetime "checkout_at"
+    t.date "due_at"
+    t.datetime "returned_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["book_id"], name: "index_books_instances_on_book_id"
+    t.index ["lended_by_id"], name: "index_books_instances_on_lended_by_id"
+    t.index ["reserved_by_id"], name: "index_books_instances_on_reserved_by_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "family_name"
+    t.string "given_name"
+    t.text "address"
+    t.string "email"
+    t.string "password"
+    t.boolean "blocked"
+    t.text "remarks"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  add_foreign_key "books_instances", "books"
+  add_foreign_key "books_instances", "users", column: "lended_by_id"
+  add_foreign_key "books_instances", "users", column: "reserved_by_id"
 end

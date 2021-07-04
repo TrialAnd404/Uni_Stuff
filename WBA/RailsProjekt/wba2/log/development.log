@@ -38,3 +38,25 @@ Migrating to CreateUsers (20210702114328)
   [1m[36mActiveRecord::SchemaMigration Create (0.3ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES (?)[0m  [["version", "20210702114328"]]
   [1m[36mTRANSACTION (18.4ms)[0m  [1m[36mcommit transaction[0m
 Migrating to CreateBooksInstances (20210702115624)
+  [1m[35m (0.5ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to CreateBooksInstances (20210702115624)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.4ms)[0m  [1m[35mCREATE TABLE "books_instances" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "book_id" integer NOT NULL, "shelfmark" varchar, "purchased_at" date, "lended_by_id" integer, "reserved_by_id" integer, "checkout_at" datetime, "due_at" date, "returned_at" datetime, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_4657a0e8d0"
+FOREIGN KEY ("book_id")
+  REFERENCES "books" ("id")
+, CONSTRAINT "fk_rails_877d6131d5"
+FOREIGN KEY ("lended_by_id")
+  REFERENCES "users" ("id")
+, CONSTRAINT "fk_rails_e0d1d74ffb"
+FOREIGN KEY ("reserved_by_id")
+  REFERENCES "users" ("id")
+)[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_books_instances_on_book_id" ON "books_instances" ("book_id")[0m
+  [1m[35m (0.3ms)[0m  [1m[35mCREATE INDEX "index_books_instances_on_lended_by_id" ON "books_instances" ("lended_by_id")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_books_instances_on_reserved_by_id" ON "books_instances" ("reserved_by_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES (?)[0m  [["version", "20210702115624"]]
+  [1m[36mTRANSACTION (8.8ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? LIMIT ?[0m  [["key", "environment"], ["LIMIT", 1]]
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT sqlite_version(*)[0m
+  [1m[35m (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
