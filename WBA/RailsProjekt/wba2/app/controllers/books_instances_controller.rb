@@ -56,6 +56,8 @@ class BooksInstancesController < ApplicationController
     end
   end
 
+  @books_instances = BookInstance.custom_select(params[:filter])
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_books_instance

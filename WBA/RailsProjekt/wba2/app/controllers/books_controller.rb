@@ -56,6 +56,8 @@ class BooksController < ApplicationController
     end
   end
 
+  @books = Book.custom_select(params[:filter])
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_book
@@ -66,4 +68,12 @@ class BooksController < ApplicationController
     def book_params
       params.require(:book).permit(:title, :publisher, :pub_year, :edition, :isbn)
     end
+
+	def lending
+
+	end
+  
+	def reserving
+
+	end
 end
