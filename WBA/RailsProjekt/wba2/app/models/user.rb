@@ -34,20 +34,21 @@ class User < ApplicationRecord
 			return users
 		end
 
-	def short_name
-		shortname = self.given_name[0]+". "+self.family_name
-		return shortname
-	end
-
-	def has_books
-		if BookInstance.where("lended_by_id = ?", @self.id).exists?
-			throw :abort
-			errors.add(:lended_by_id, "User hat noch geliehene Bücher")
+		def short_name
+			shortname = self.given_name[0]+". "+self.family_name
+			return shortname
 		end
-	end
 
-	def toString
+		def has_books
+			if BookInstance.where("lended_by_id = ?", @self.id).exists?
+				throw :abort
+				errors.add(:lended_by_id, "User hat noch geliehene Bücher")
+			end
+		end
 
+		def toString
+
+		end
 	end
 
 end

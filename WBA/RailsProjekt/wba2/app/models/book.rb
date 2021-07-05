@@ -35,4 +35,5 @@ class Book < ApplicationRecord
 		def toString
 		
 		end
+	end
 end

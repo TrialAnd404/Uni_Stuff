@@ -27,4 +27,5 @@ class Author < ApplicationRecord
 		def toString
 		
 		end
+	end
 end
