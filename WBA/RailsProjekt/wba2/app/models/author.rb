@@ -1,7 +1,12 @@
 class Author < ApplicationRecord
 	has_and_belongs_to_many :book, dependent: :destroy
 
-	validates :family_name, :given_name, :affiliation presence: true
+	validates :affiliation :presence => true
+	validates :given_name, :presence => true
+	validates :family_name, :presence => true
+	validates :family_name, uniqueness: { scope: :first_name }
+	validates :given_name, format: { with: /\A[a-zA-Z]+\z/, message: "only allows letters" }
+	validates :family_name, format: { with: /\A[a-zA-Z]+\z/, message: "only allows letters" }
 
 	protected
 		def self.custom_select(filter)
@@ -22,4 +27,5 @@ class Author < ApplicationRecord
 		def toString
 		
 		end
+	end
 end

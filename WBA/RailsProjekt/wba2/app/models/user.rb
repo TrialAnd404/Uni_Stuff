@@ -1,8 +1,17 @@
 class User < ApplicationRecord
 	has_many :book_instances
 
-	validates :family_name, :given_name, :address, :email, :password, presence: true
-	validates :email, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
+	validates :address, :presence => true
+	validates :given_name, :presence => true
+	validates :family_name, :presence => true
+	validates :password, :presence => true
+	validates :email, :presence => true
+
+	validates :family_name, uniqueness: { scope: :first_name }
+	validates :given_name, format: { with: /\A[a-zA-Z]+\z/, message: "nur Buchstaben erlaubt" }
+	validates :family_name, format: { with: /\A[a-zA-Z]+\z/, message: "nur Buchstaben erlaubt" }
+
+	validates :email, :uniqueness => true, format: {with: URI::MailTo::EMAIL_REGEXP}
 	validates :password, confirmation: true, 
 		format: { with: /^\w[8,]$/,
 		message: 'mindestens 8 Zeichen'}
@@ -25,20 +34,21 @@ class User < ApplicationRecord
 			return users
 		end
 
-	def short_name
-		shortname = self.given_name[0]+". "+self.family_name
-		return shortname
-	end
-
-	def has_books
-		if BookInstance.where("lended_by_id = ?", @self.id).exists?
-			throw :abort
-			errors.add(:lended_by_id, "User hat noch geliehene Bücher")
+		def short_name
+			shortname = self.given_name[0]+". "+self.family_name
+			return shortname
 		end
-	end
 
-	def toString
+		def has_books
+			if BookInstance.where("lended_by_id = ?", @self.id).exists?
+				throw :abort
+				errors.add(:lended_by_id, "User hat noch geliehene Bücher")
+			end
+		end
 
+		def toString
+
+		end
 	end
 
 end

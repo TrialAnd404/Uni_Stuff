@@ -1,5 +1,5 @@
 class BooksInstancesController < ApplicationController
-  before_action :set_books_instance, only: %i[ show edit update destroy ]
+  before_action :set_books_instance, only: %i[ show edit update destroy lending reserving ]
 
   # GET /books_instances or /books_instances.json
   def index
@@ -59,6 +59,8 @@ class BooksInstancesController < ApplicationController
   @books_instances = BookInstance.custom_select(params[:filter])
 
   def lending
+	if all_params['User']{|a| }
+	end
 	all_params['User']{|a| @book_instance.lended_by_id = a.to_i}
   end
 

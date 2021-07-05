@@ -1,9 +1,11 @@
 class Book < ApplicationRecord
 	has_many: book_instances, dependent: :destroy
-	has_and_belongs_to_many: authors, dependent: :destroy
+	has_and_belongs_to_many: authors
 
 	validates :title, :publisher, :edition, :isbn presence: true
-	validates :isbn, format: { multiline: true, with: /^(?=[0-9X]{10}$|(?=(?:[0-9]+[-\ ]){3})[-\ 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[-\ ]){4})[-\ 0-9]{17}$)(?:97[89][-\ ]?)?[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9X]$/}
+	validates :isbn, 
+		:uniqueness => true,
+		format: { multiline: true, with: /^(?=[0-9X]{10}$|(?=(?:[0-9]+[-\ ]){3})[-\ 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[-\ ]){4})[-\ 0-9]{17}$)(?:97[89][-\ ]?)?[0-9]{1,5}[-\ ]?[0-9]+[-\ ]?[0-9]+[-\ ]?[0-9X]$/}
 		# (?=                       # Basic format pre-checks (lookahead):
 		# 	[0-9X]{10}$             #   Require 10 digits/Xs (no separators).
 		# |                        #  Or:
@@ -33,4 +35,5 @@ class Book < ApplicationRecord
 		def toString
 		
 		end
+	end
 end

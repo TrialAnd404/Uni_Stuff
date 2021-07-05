@@ -26,7 +26,7 @@ class BooksInstance < ApplicationRecord
 		end
 
 		def set_due
-			self.due_at = self.checkout_at + (14*24*60*60)
+			self.due_at = self.checkout_at + (28*24*60*60)
 		end
 
 		def initialize
@@ -36,4 +36,5 @@ class BooksInstance < ApplicationRecord
 		def toString
 		
 		end
+	end
 end
