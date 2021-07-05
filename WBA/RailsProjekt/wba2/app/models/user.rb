@@ -1,8 +1,17 @@
 class User < ApplicationRecord
 	has_many :book_instances
 
-	validates :family_name, :given_name, :address, :email, :password, presence: true
-	validates :email, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
+	validates :address, :presence => true
+	validates :given_name, :presence => true
+	validates :family_name, :presence => true
+	validates :password, :presence => true
+	validates :email, :presence => true
+
+	validates :family_name, uniqueness: { scope: :first_name }
+	validates :given_name, format: { with: /\A[a-zA-Z]+\z/, message: "nur Buchstaben erlaubt" }
+	validates :family_name, format: { with: /\A[a-zA-Z]+\z/, message: "nur Buchstaben erlaubt" }
+
+	validates :email, :uniqueness => true, format: {with: URI::MailTo::EMAIL_REGEXP}
 	validates :password, confirmation: true, 
 		format: { with: /^\w[8,]$/,
 		message: 'mindestens 8 Zeichen'}
