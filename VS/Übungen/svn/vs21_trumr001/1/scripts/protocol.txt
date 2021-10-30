@@ -1,1 +1,0 @@
-Fehler in Test 0 Keine Args -> kein RTFM
