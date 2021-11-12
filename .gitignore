@@ -3,8 +3,9 @@ VS/Übungen/svn/*
 *.svn/pristine*
 *.svn-base
 *.html
+raw/
 wbaRails/*
 *.zip
 *.dat
 KI/Übungen/Teil2/*.csv
-
+elastic*/
